@@ -16,7 +16,7 @@ def parse_spotify_history_json(response_path:str)->list[md.Song]:
                 {
                     song_name: str,
                     artists: [artist_name],
-                    song_id: string
+                    song_uri: string
                     duration_s: int                    
                 }
             ]
@@ -34,30 +34,31 @@ def parse_spotify_history_json(response_path:str)->list[md.Song]:
         # process as list of artist names? 
         artists_list:list[md.Artist] = []
         for artist in artists:
-            artists_list.append(md.Artist(name=artist["name"], id=artist["id"]))
-        song = md.Song(name=track["name"],id=track["id"], artists=artists_list, duration_s=track["duration_ms"] / 60)
+            artists_list.append(md.Artist(name=artist["name"], uri=artist["uri"]))
+        song = md.Song(name=track["name"],uri=track["uri"], artists=artists_list, duration_s=track["duration_ms"] / 60)
         recently_played.append(song) 
 
     return recently_played
 
-class Json_Playlist_Database_Handler():
+def load_slice(slice_path)->list[(int, list[md.Song])]:
+    # loads into a list of playlists, each holding num_followers and songs in that playlist
 
-    custom_location = "/media/mattyb/UBUNTU 22_0/P3-template-main/spotify_million_playlist_dataset"
+    with open(slice_path, 'r') as f:
+        slice_json = json.load(f)
 
-    def __init__(self, dataset_location:str =None, num_playlists:int = None) -> None:
-        
-        """
-            dataset_location: string of the filepath to dataset
-            num_playlists: value from 0 to 1 Million that gives number of playlists to be included in handler
-        """
+    parsed_slice:list[(int, list[md.Song])] = []
 
-        self.dataset_location = dataset_location if dataset_location is not None else self.custom_location
-        self.num_playlists = 1_000_000 if num_playlists is None else num_playlists
+    for playlist in slice_json["playlists"]:
+        followers = playlist["num_followers"]
+        parsed_playlist = []
+        for track in playlist["tracks"]:
+            song = md.Song(name=track["track_name"], 
+                           uri=track["track_uri"],
+                           artists=[md.Artist(name=track["artist_name"], uri=track["artist_uri"])],
+                           duration_s=track["duration_ms"]/60
+                           )
+            parsed_playlist.append(song)
 
-    def get_slice_filename(i_slice) ->str:
-        # returns string to the 
-        pass
+        parsed_slice.append((followers, parsed_playlist))
 
-    def get_playlist_json(i:int ):
-        # returns a dict of the ith playlist in dataset
-        pass
+    return parsed_slice
