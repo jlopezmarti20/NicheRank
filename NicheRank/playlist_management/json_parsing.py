@@ -6,8 +6,10 @@ import music_dataclass as md
     This can be edited according to however the database is setup.
 
 """
+from typing import List, Tuple
 
-def parse_spotify_history_json(response_path:str)->list[md.Song]:
+
+def parse_spotify_history_json(response_path:str)->List[md.Song]:
     """
         parse playlist spotify into a list of dictionaries of song stats 
         see https://developer.spotify.com/documentation/web-api/reference/get-recently-played for more on responses
@@ -40,7 +42,7 @@ def parse_spotify_history_json(response_path:str)->list[md.Song]:
 
     return recently_played
 
-def load_slice(slice_path)->list[(int, list[md.Song])]:
+def load_slice(slice_path)->List[Tuple[int, list[md.Song]]]:
     # loads into a list of playlists, each holding num_followers and songs in that playlist
 
     with open(slice_path, 'r') as f:

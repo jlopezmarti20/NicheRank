@@ -1,5 +1,9 @@
 import os 
+from typing import List, Tuple, Dict
+
 import music_dataclass as md
+import json_parsing
+
 
 """
     This class works as a script that goes through and converts each artist into a map of artist_id to artist dataclass  
@@ -7,7 +11,7 @@ import music_dataclass as md
 
 class Playlist_Database_Handler():
 
-    def __init__(self, database_path, load_percent=0.5, sorting_algorithm="map", profile=False) -> None:
+    def __init__(self, database_path, sorting_algorithm="map", profile=False) -> None:
         
         """
             playlist_path: path to the database file
@@ -16,8 +20,6 @@ class Playlist_Database_Handler():
             profile: if to profile and track sorting time
         """
         self.database_path = database_path 
-        self.load_percent = load_percent 
-        self.num_playlists = load_percent * 1_000_000
         self.sorting_algorithm = sorting_algorithm
         self.profile = profile
 
@@ -37,34 +39,101 @@ class Playlist_Database_Handler():
         pass
 
     def save_song_stats(self, save_path="NicheRank/playlist_management/playlist_stats"):
+        # TODO maybe also switch this to json parsing?
         song_stats: list[md.Song_Stat] = self.load_unordered_global_song_stats()
         json_name = f"song_stats_{self.num_playlists}_{self.sorting_algorithm}.json"
 
         pass
         
-    def load_artist_stats(self) -> list[md.Artist_Stat]:
+    def load_artist_stats(self, load_percent=0.5) -> Dict[md.Artist_Stat]:
         """
             creates a list of artist stats (unordered) 
         """
 
+        if (load_percent < 0.0 or load_percent > 1.0):
+            load_percent = 0.5
+        else:
+            load_percent = load_percent
 
+        num_playlists = load_percent * 1_000_000 # how many playlists to parse out of 1M
+        # first, load every artist in every playlist
+        data_dir = os.path.join(self.database_path, 'data')
+        endslice: int = num_playlists / 1000
+        slices: List[str] = os.listdir(data_dir)
+        artist_dict: Dict[str, md.Artist_Stat] = {} # artist_uri: Artist_Stat dataclass
 
-        pass
-
-    def load_song_stats(self) -> list[md.Song_Stat]:
+        for i in range(endslice + 1):
+            # current slice has playlists 
+            cur_slice = slices[i]
+            cur_slice_path = os.path.join(data_dir, cur_slice)
+            playlists: List[Tuple[int, md.Song]] = json_parsing.load_slice(cur_slice_path)
+            
+            for j, (followers, playlist) in enumerate(playlists):
+                if i == endslice and j == num_playlists % 1000:
+                    # for processing final slice
+                    break
+                artist_seen = set()
+                for song in playlist:
+                    for artist in song.artists:
+                        if artist.uri not in artist_dict:
+                            artist_dict[artist.uri] = md.Artist_Stat(artist=artist, total_s=0, total_songs=0, weighted_listens= 0, total_playlists=0)
+                        artist_dict[artist.uri].total_s += song.duration_s
+                        artist_dict[artist.uri].weighted_listens += followers
+                        artist_dict[artist.uri].total_songs += 1
+                        if artist.uri not in artist_seen:
+                            artist_dict[artist.uri].total_playlists += 1
+                            artist_seen.add(artist.uri)
+        return artist_dict
+        
+    def load_song_stats(self, load_percent=0.5) -> Dict[md.Song_Stat]:
         """
             Creates a list of song_stats (unordered)
         
         """
+        if (load_percent < 0.0 or load_percent > 1.0):
+            load_percent = 0.5
+        else:
+            load_percent = load_percent
 
-        pass
+        num_playlists = load_percent * 1_000_000 # how many playlists to parse out of 1M
+        # first, load every artist in every playlist
+        data_dir = os.path.join(self.database_path, 'data')
+        endslice: int = num_playlists / 1000
+        slices: List[str] = os.listdir(data_dir)
+        songs_dict: Dict[str, md.Song_Stat] = {} # song_uri: song_stat dataclass
 
+        for i in range(endslice + 1):
+            cur_slice = slice[i]
+            cur_slice_path = os.path.join(data_dir, cur_slice)
+            playlists: List[Tuple[int, md.Song]] = json_parsing.load_slice(cur_slice_path)
+
+            for j, (followers, playlist) in enumerate(playlists):
+                if i == endslice and j == num_playlists % 1000:
+                    break
+
+                for song in playlist:
+                    if song.uri not in songs_dict:
+                        song_stat = md.Song_Stat(song=song, total_listens=0, weighted_listens=0)
+                        songs_dict[song.uri] = song_stat
+                    songs_dict[song.uri].total_listens += 1
+                    songs_dict[song.uri].weighted_listens += followers
+                    
+        return songs_dict
+
+
+def map_sort_list():
+    
+    pass
+
+def merge_sort_music():
+    
+    pass
 
 def test():
 
     database_path = "/media/mattyb/UBUNTU 22_0/P3-template-main/spotify_million_playlist_dataset"
-
-    pass
+    playlist_handler = Playlist_Database_Handler(database_path=database_path)
+    
 
 if __name__ == "__main__":
     test()
