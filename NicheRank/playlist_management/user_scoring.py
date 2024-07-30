@@ -1,6 +1,7 @@
 
 import os
 import json_parsing
+import music_dataclass as md
 
 """
     insert a spotify listening history json file and store, then output top songs, top artists etc
@@ -11,9 +12,9 @@ default_recently_played = "idk" #! change this to config data!
 
 class User_Listening_Stats():
 
-    def __init__(self, recently_played:str) -> None:
+    def __init__(self, spotify_history:str) -> None:
         # history_location: string of where spotify json file is
-        self.recently_played = recently_played 
+        self.spotify_history = spotify_history 
         self.artists_metrics = None
         self.songs_metrics = None
 
@@ -34,7 +35,7 @@ class User_Listening_Stats():
                 }
             ]
         """
-
+        song_history:list[md.Song] = json_parsing.parse_spotify_history_json(self.spotify_history)
         # updates artist_metrics and songs_metrics by going through track list
         
 
