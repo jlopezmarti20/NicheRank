@@ -2,10 +2,10 @@ import json
 import music_dataclass as md
 
 """
-    Methods for parsing json into objects for python class use
+    Methods for parsing json into objects for python class use.
+    This can be edited according to however the database is setup.
 
 """
-
 
 def parse_spotify_history_json(response_path:str)->list[md.Song]:
     """

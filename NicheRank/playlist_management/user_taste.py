@@ -10,7 +10,7 @@ import music_dataclass as md
 
 default_recently_played = "idk" #! change this to config data!
 
-class User_Listening_Stats():
+class User_Taste():
 
     def __init__(self, spotify_history:str) -> None:
         # history_location: string of where spotify json file is
