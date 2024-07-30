@@ -27,14 +27,14 @@ def parse_spotify_history_json(response_path:str)->List[md.Song]:
     with open(response_path, "r") as f:
         response_json = json.load(f)
 
-    recently_played: list[md.Song_Stat] = [] # list of song dataclasses
+    recently_played: List[md.Song_Stat] = [] # list of song dataclasses
     for play_history in response_json["items"]:
         # organizes json object into more easily parsable list of song dataclasses
 
         track = play_history["track"]
         artists = track["artists"]
         # process as list of artist names? 
-        artists_list:list[md.Artist] = []
+        artists_list: List[md.Artist] = []
         for artist in artists:
             artists_list.append(md.Artist(name=artist["name"], uri=artist["uri"]))
         song = md.Song(name=track["name"],uri=track["uri"], artists=artists_list, duration_s=track["duration_ms"] / 60)
@@ -42,7 +42,7 @@ def parse_spotify_history_json(response_path:str)->List[md.Song]:
 
     return recently_played
 
-def load_slice(slice_path)->List[Tuple[int, list[md.Song]]]:
+def load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
     # loads into a list of playlists, each holding num_followers and songs in that playlist
 
     with open(slice_path, 'r') as f:

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import List
 
 @dataclass
 class Artist:
@@ -10,7 +10,7 @@ class Artist:
 class Song:
     name:str
     uri:str
-    artists: list[Artist]
+    artists: List[Artist]
     duration_s: int 
 
 @dataclass
@@ -52,5 +52,5 @@ class Song_Popularity_Score_Calculator():
     def __init__(self) -> None:
         pass
 
-    def __call__(self, song_stat:Song_Stat) -> Any:
+    def __call__(self, song_stat:Song_Stat):
         pass

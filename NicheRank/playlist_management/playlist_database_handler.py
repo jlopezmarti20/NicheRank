@@ -1,4 +1,6 @@
 import os 
+from tqdm import tqdm
+import time
 from typing import List, Tuple, Dict
 
 import music_dataclass as md
@@ -9,7 +11,7 @@ import json_parsing
     This class works as a script that goes through and converts each artist into a map of artist_id to artist dataclass  
 """
 
-class Playlist_Database_Handler():
+class Playlist_Database_Loader():
 
     def __init__(self, database_path, sorting_algorithm="map", profile=False) -> None:
         
@@ -45,7 +47,7 @@ class Playlist_Database_Handler():
 
         pass
         
-    def load_artist_stats(self, load_percent=0.5) -> Dict[md.Artist_Stat]:
+    def load_artist_stats(self, load_percent=0.5) -> Dict[str, md.Artist_Stat]:
         """
             creates a list of artist stats (unordered) 
         """
@@ -56,13 +58,16 @@ class Playlist_Database_Handler():
             load_percent = load_percent
 
         num_playlists = load_percent * 1_000_000 # how many playlists to parse out of 1M
+        print(f"Loading {num_playlists} playlists!")
         # first, load every artist in every playlist
         data_dir = os.path.join(self.database_path, 'data')
-        endslice: int = num_playlists / 1000
+        endslice: int = int(num_playlists // 1000)
         slices: List[str] = os.listdir(data_dir)
         artist_dict: Dict[str, md.Artist_Stat] = {} # artist_uri: Artist_Stat dataclass
+        slice_range = tqdm(range(endslice + 1), disable= not self.profile)
+        start_time = time.time()
 
-        for i in range(endslice + 1):
+        for i in slice_range:
             # current slice has playlists 
             cur_slice = slices[i]
             cur_slice_path = os.path.join(data_dir, cur_slice)
@@ -83,9 +88,14 @@ class Playlist_Database_Handler():
                         if artist.uri not in artist_seen:
                             artist_dict[artist.uri].total_playlists += 1
                             artist_seen.add(artist.uri)
+
+        if (self.profile):
+            end_time = time.time()
+            finish = end_time - start_time
+            print(f"finished in {finish:.2f} seconds")
         return artist_dict
         
-    def load_song_stats(self, load_percent=0.5) -> Dict[md.Song_Stat]:
+    def load_song_stats(self, load_percent=0.5) -> Dict[str, md.Song_Stat]:
         """
             Creates a list of song_stats (unordered)
         
@@ -98,12 +108,14 @@ class Playlist_Database_Handler():
         num_playlists = load_percent * 1_000_000 # how many playlists to parse out of 1M
         # first, load every artist in every playlist
         data_dir = os.path.join(self.database_path, 'data')
-        endslice: int = num_playlists / 1000
+        endslice: int = int(num_playlists // 1000)
         slices: List[str] = os.listdir(data_dir)
         songs_dict: Dict[str, md.Song_Stat] = {} # song_uri: song_stat dataclass
+        slice_range = tqdm(range(endslice + 1), disable=not self.profile)
+        start_time = time.time()
 
-        for i in range(endslice + 1):
-            cur_slice = slice[i]
+        for i in slice_range:
+            cur_slice = slices[i]
             cur_slice_path = os.path.join(data_dir, cur_slice)
             playlists: List[Tuple[int, md.Song]] = json_parsing.load_slice(cur_slice_path)
 
@@ -118,22 +130,36 @@ class Playlist_Database_Handler():
                     songs_dict[song.uri].total_listens += 1
                     songs_dict[song.uri].weighted_listens += followers
                     
+        if (self.profile):
+            end_time = time.time()
+            finish = end_time - start_time
+            print(f"finished in {finish:.2f} seconds")
+
         return songs_dict
 
+def test_song_load(database):
 
-def map_sort_list():
-    
-    pass
+    playlist_handler = Playlist_Database_Loader(database_path=database, profile=True)
+    song_stats_dict = playlist_handler.load_song_stats(load_percent=0.1)
 
-def merge_sort_music():
-    
-    pass
+def test_artist_load(database):
+
+    playlist_handler = Playlist_Database_Loader(database_path=database, profile=True)
+    artist_stats_dict = playlist_handler.load_artist_stats(load_percent=0.1)
+
+def test_edge_song_load(database):
+    playlist_handler = Playlist_Database_Loader(database_path=database, profile=True)
+    song_stats_dict = playlist_handler.load_song_stats(load_percent=1)
+
+
+def test_edge_artist_load(database):
+    playlist_handler = Playlist_Database_Loader(database_path=database, profile=True)
+    artist_stats_dict = playlist_handler.load_artist_stats(load_percent=1)
 
 def test():
 
     database_path = "/media/mattyb/UBUNTU 22_0/P3-template-main/spotify_million_playlist_dataset"
-    playlist_handler = Playlist_Database_Handler(database_path=database_path)
-    
+    test_song_load(database_path)
 
 if __name__ == "__main__":
     test()
