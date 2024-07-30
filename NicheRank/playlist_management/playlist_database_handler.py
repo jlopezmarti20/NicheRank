@@ -5,6 +5,9 @@ from typing import List, Tuple, Dict
 
 import music_dataclass as md
 import json_parsing
+import cProfile
+import pstats
+from io import StringIO
 
 
 """
@@ -57,15 +60,17 @@ class Playlist_Database_Loader():
         else:
             load_percent = load_percent
 
-        num_playlists = load_percent * 1_000_000 # how many playlists to parse out of 1M
-        print(f"Loading {num_playlists} playlists!")
+        num_playlists = int(load_percent * 1_000_000) # how many playlists to parse out of 1M
         # first, load every artist in every playlist
         data_dir = os.path.join(self.database_path, 'data')
-        endslice: int = int(num_playlists // 1000)
+        endslice: int = num_playlists // 1000
         slices: List[str] = os.listdir(data_dir)
         artist_dict: Dict[str, md.Artist_Stat] = {} # artist_uri: Artist_Stat dataclass
         slice_range = tqdm(range(endslice + 1), disable= not self.profile)
-        start_time = time.time()
+        
+        if self.profile:
+            pr = cProfile.Profile()
+            pr.enable()
 
         for i in slice_range:
             # current slice has playlists 
@@ -92,7 +97,14 @@ class Playlist_Database_Loader():
         if (self.profile):
             end_time = time.time()
             finish = end_time - start_time
-            print(f"finished in {finish:.2f} seconds")
+            print(f"finished loading artists from {num_playlists} playlists in {finish:.2f} seconds")
+            pr.disable()
+            s = StringIO()
+            ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
+            ps.print_stats()
+
+            # Print the profile output
+            print(s.getvalue())
         return artist_dict
         
     def load_song_stats(self, load_percent=0.5) -> Dict[str, md.Song_Stat]:
@@ -105,14 +117,18 @@ class Playlist_Database_Loader():
         else:
             load_percent = load_percent
 
-        num_playlists = load_percent * 1_000_000 # how many playlists to parse out of 1M
+        num_playlists = int(load_percent * 1_000_000) # how many playlists to parse out of 1M
         # first, load every artist in every playlist
         data_dir = os.path.join(self.database_path, 'data')
-        endslice: int = int(num_playlists // 1000)
+        endslice: int = num_playlists // 1000
         slices: List[str] = os.listdir(data_dir)
         songs_dict: Dict[str, md.Song_Stat] = {} # song_uri: song_stat dataclass
         slice_range = tqdm(range(endslice + 1), disable=not self.profile)
-        start_time = time.time()
+
+        if self.profile:
+            start_time = time.time()
+            pr = cProfile.Profile()
+            pr.enable()
 
         for i in slice_range:
             cur_slice = slices[i]
@@ -133,8 +149,14 @@ class Playlist_Database_Loader():
         if (self.profile):
             end_time = time.time()
             finish = end_time - start_time
-            print(f"finished in {finish:.2f} seconds")
+            print(f"finished loading songs from {num_playlists} playlists in {finish:.2f} seconds")
+            pr.disable()
+            s = StringIO()
+            ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
+            ps.print_stats()
 
+            # Print the profile output
+            print(s.getvalue())
         return songs_dict
 
 def test_song_load(database):
