@@ -4,12 +4,12 @@ from typing import Any
 @dataclass
 class Artist:
     name:str
-    id:str
+    uri:str
 
 @dataclass 
 class Song:
     name:str
-    id:str
+    uri:str
     artists: list[Artist]
     duration_s: int 
 
