@@ -15,7 +15,7 @@ from io import StringIO
     
 """
 
-class Playlist_Database_Loader():
+class Artiststats_Playlist_Loader():
 
     def __init__(self, database_path, sorting_algorithm="map", profile=False) -> None:
         
@@ -35,21 +35,6 @@ class Playlist_Database_Loader():
         # check if database path exists
         if (not os.path.exists(self.database_path)):
             raise IOError(f'File doesnt exist: {self.database_path}')
-        
-    def save_artist_stats(self,save_path="NicheRank/playlist_management/playlist_stats"):
-        
-        # TODO maybe switch this functionality to json parsing? 
-        artist_stats: list[md.Artist_Stat] = self.load_unordered_global_artist_stats()
-        json_name = f"artist_stats_{self.num_playlists}_{self.sorting_algorithm}.json"
-        fpath = os.path.join(save_path, json_name)
-        pass
-
-    def save_song_stats(self, save_path="NicheRank/playlist_management/playlist_stats"):
-        # TODO maybe also switch this to json parsing?
-        song_stats: list[md.Song_Stat] = self.load_unordered_global_song_stats()
-        json_name = f"song_stats_{self.num_playlists}_{self.sorting_algorithm}.json"
-
-        pass
         
     def load_artist_stats(self, load_percent=0.5,json_parse="fast") -> Dict[str, md.Artist_Stat]:
         """
@@ -108,6 +93,28 @@ class Playlist_Database_Loader():
             # Print the profile output
             print(s.getvalue())
         return artist_dict
+
+class Songstats_Playlist_Loader():
+
+    def __init__(self, database_path, sorting_algorithm="map", profile=False) -> None:
+        
+        """
+            playlist_path: path to the database file
+            load_percent: what percent of the million databases to load (default is max)
+            sorting_algorithm: which sorting algorithm to use for this ("map", "merge") are 2 
+            profile: if to profile and track sorting time
+        """
+        self.database_path = database_path 
+        self.sorting_algorithm = sorting_algorithm
+        self.profile = profile
+
+        self.global_song_stats = None
+        self.global_artist_stats = None
+
+        # check if database path exists
+        if (not os.path.exists(self.database_path)):
+            raise IOError(f'File doesnt exist: {self.database_path}')
+        
         
     def load_song_stats(self, load_percent=0.5, json_parse="fast") -> Dict[str, md.Song_Stat]:
         """
@@ -161,23 +168,24 @@ class Playlist_Database_Loader():
             print(s.getvalue())
         return songs_dict
 
+
 def test_song_load(database):
 
-    playlist_handler = Playlist_Database_Loader(database_path=database, profile=True)
+    playlist_handler = Songstats_Playlist_Loader(database_path=database, profile=True)
     song_stats_dict = playlist_handler.load_song_stats(load_percent=0.1)
 
 def test_artist_load(database):
 
-    playlist_handler = Playlist_Database_Loader(database_path=database, profile=True)
+    playlist_handler = Artiststats_Playlist_Loader(database_path=database, profile=True)
     artist_stats_dict = playlist_handler.load_artist_stats(load_percent=0.1)
 
 def test_edge_song_load(database):
-    playlist_handler = Playlist_Database_Loader(database_path=database, profile=True)
+    playlist_handler = Songstats_Playlist_Loader(database_path=database, profile=True)
     song_stats_dict = playlist_handler.load_song_stats(load_percent=1)
 
 
 def test_edge_artist_load(database):
-    playlist_handler = Playlist_Database_Loader(database_path=database, profile=True)
+    playlist_handler = Artiststats_Playlist_Loader(database_path=database, profile=True)
     artist_stats_dict = playlist_handler.load_artist_stats(load_percent=1)
 
 def test():
