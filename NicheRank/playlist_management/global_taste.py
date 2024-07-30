@@ -15,9 +15,3 @@ class Global_Taste():
         pass
 
 
-    def calculate_nicheness(user: User_Listening_Profile):
-        """
-            EXTREMELY IMPORTANT!!! 
-            Takes a users listening profile and matches it to the global popularity 
-            ranking to calculate that users nicheness score. 
-        """
