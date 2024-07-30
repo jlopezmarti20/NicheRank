@@ -42,7 +42,19 @@ def parse_spotify_history_json(response_path:str)->List[md.Song]:
 
     return recently_played
 
-def load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
+def load_slice(slice_path, version="fast")->List[ Tuple[int, List[md.Song]]]:
+    # loads into a list of playlists, each holding num_followers and songs in that playlist
+    if version == "fast":
+        return faster_load_slice(slice_path)
+    
+    elif version == "slow":
+        return slow_load_slice(slice_path)
+    
+    else:
+        return faster_load_slice(slice_path)
+
+def slow_load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
+    
     # loads into a list of playlists, each holding num_followers and songs in that playlist
 
     with open(slice_path, 'r') as f:
@@ -57,10 +69,36 @@ def load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
             song = md.Song(name=track["track_name"], 
                            uri=track["track_uri"],
                            artists=[md.Artist(name=track["artist_name"], uri=track["artist_uri"])],
-                           duration_s=track["duration_ms"]/60
+                           duration_s=track["duration_ms"]/1000
                            )
             parsed_playlist.append(song)
 
         parsed_slice.append((followers, parsed_playlist))
+
+    return parsed_slice
+
+
+def faster_load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
+
+    # use a list comprehension instead
+
+    with open(slice_path, 'r') as f:
+        slice_json = json.load(f)
+    # Parse playlists into the desired format
+    parsed_slice = [
+        (
+            playlist["num_followers"],
+            [
+                md.Song(
+                    name=track["track_name"],
+                    uri=track["track_uri"],
+                    artists=[md.Artist(name=track["artist_name"], uri=track["artist_uri"])],
+                    duration_s=track["duration_ms"] / 1000  # Corrected conversion to seconds
+                )
+                for track in playlist["tracks"]
+            ]
+        )
+        for playlist in slice_json["playlists"]
+    ]
 
     return parsed_slice

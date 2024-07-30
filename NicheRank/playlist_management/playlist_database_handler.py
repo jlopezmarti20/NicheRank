@@ -11,7 +11,8 @@ from io import StringIO
 
 
 """
-    This class works as a script that goes through and converts each artist into a map of artist_id to artist dataclass  
+    This class takes in the database path and returns a dictionary of 
+    
 """
 
 class Playlist_Database_Loader():
@@ -50,7 +51,7 @@ class Playlist_Database_Loader():
 
         pass
         
-    def load_artist_stats(self, load_percent=0.5) -> Dict[str, md.Artist_Stat]:
+    def load_artist_stats(self, load_percent=0.5,json_parse="fast") -> Dict[str, md.Artist_Stat]:
         """
             creates a list of artist stats (unordered) 
         """
@@ -71,12 +72,13 @@ class Playlist_Database_Loader():
         if self.profile:
             pr = cProfile.Profile()
             pr.enable()
+            start_time = time.time()
 
         for i in slice_range:
             # current slice has playlists 
             cur_slice = slices[i]
             cur_slice_path = os.path.join(data_dir, cur_slice)
-            playlists: List[Tuple[int, md.Song]] = json_parsing.load_slice(cur_slice_path)
+            playlists: List[Tuple[int, md.Song]] = json_parsing.load_slice(cur_slice_path,json_parse)
             
             for j, (followers, playlist) in enumerate(playlists):
                 if i == endslice and j == num_playlists % 1000:
@@ -107,7 +109,7 @@ class Playlist_Database_Loader():
             print(s.getvalue())
         return artist_dict
         
-    def load_song_stats(self, load_percent=0.5) -> Dict[str, md.Song_Stat]:
+    def load_song_stats(self, load_percent=0.5, json_parse="fast") -> Dict[str, md.Song_Stat]:
         """
             Creates a list of song_stats (unordered)
         
@@ -133,7 +135,7 @@ class Playlist_Database_Loader():
         for i in slice_range:
             cur_slice = slices[i]
             cur_slice_path = os.path.join(data_dir, cur_slice)
-            playlists: List[Tuple[int, md.Song]] = json_parsing.load_slice(cur_slice_path)
+            playlists: List[Tuple[int, md.Song]] = json_parsing.load_slice(cur_slice_path,json_parse)
 
             for j, (followers, playlist) in enumerate(playlists):
                 if i == endslice and j == num_playlists % 1000:
