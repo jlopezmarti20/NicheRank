@@ -14,6 +14,12 @@ default_recently_played = "idk" #! change this to config data!
 
 class User_Taste():
 
+
+    """
+        Loads and handles an individuals spotify taste
+    
+    """
+
     def __init__(self, spotify_history_file:str) -> None:
         # history_location: string of where spotify json file is
         self.spotify_history_file = spotify_history_file 
@@ -22,11 +28,9 @@ class User_Taste():
 
         pass
 
-    def process_user_stats(self)->None:
+    def process_user_history(self, song_history: List[md.Song])->None:
         # TODO process and store a users favorite artists based on time listened  
-        
-        song_history:List[md.Song] = json_parsing.parse_spotify_history_json(self.spotify_history)
-        
+        pass        
         # sort this list with merge sort?
         # put this list into a heap?
 
@@ -72,7 +76,7 @@ class SongSorter():
             This sorting algorithm generates a hashmap for song_uri to number of repeats, and then 
             does a sort by number of keys  
         """
-        uri_song_map = {song.uri: song for song in songs if song.uri not in uri_song_map}
+        uri_song_map = {song.uri: song for song in songs}
         song_freq = {}
         for song in songs:
             if song.uri not in song_freq:
@@ -86,15 +90,17 @@ class SongSorter():
 
     def basic_merge_sort(songs: List[md.Song]) -> List[Tuple[md.Song, int]]:
         # uri: song mapping
-        uri_song_map = {song.uri: song for song in songs if song.uri not in uri_song_map}
+        uri_song_map = {song.uri: song for song in songs}
 
-        tuple_list = [(1, md.Song.uri)] # tuples of uri to song
+        tuple_list = [(1, song.uri) for song in songs] # tuples of uri to song
 
-        sorted_list:List[Tuple[int, str]] = SongSorter._merge_sort(tuple_list)
+        sorted_list: List[Tuple[int, str]] = SongSorter._merge_sort(tuple_list)
         
         # change sorted list back to (md.song, freq) 
         return [(uri_song_map[uri], freq) for (freq, uri) in sorted_list]
 
+
+    # =================== PRIVATE METHODS ===================
 
     def _tuple_song_compare(l_tup: Tuple[int, str], r_tup:Tuple[int, str]):
         # -1 if left is larger, 1 if right is larger, 0 if equal
@@ -157,24 +163,42 @@ class SongSorter():
         return SongSorter._merge(sorted_left, sorted_right) 
 
 
-def generate_testing_songs(uris):
+def create_songs_from_uris(uris):
     return [md.Song(name="", uri=uri) for uri in uris]
 
-def merge_sort_testing():
-    # test song sorting
-    uris = ["323232", "454", "65", "10", "4"]
-    songs = generate_testing_songs(uris)
-    sorted_uris = ["4", "10", "65", "454", "323232"]
-    merged_songs = generate_testing_songs(uris)
+def basic_merge_test(given_uris, target_uris):
+    songs = create_songs_from_uris(given_uris)
+    merged_songs = SongSorter.basic_merge_sort(songs)
 
-    for song in merged_songs:
-        print(song.uri)
+    for song, freq in merged_songs:
+        print(f"{song.uri}: freq {freq}")
+    
+    assert(len(merged_songs) == len(target_uris))
+    
+def hash_merge_test(given_uris, target_uris):
+    songs = create_songs_from_uris(given_uris)
+    merged_songs = SongSorter.hash_merge_sort(songs)
+
+    for song, freq in merged_songs:
+        print(f"{song.uri}: freq {freq}")
+    
+    assert(len(merged_songs) == len(target_uris))
+
+def basic_merge_sort_testing():
+    # test song sorting
+    input_1 = ["323232", "454", "65", "10", "4"]
+    expected_1 = ["4", "10", "65", "454", "323232"]
+    basic_merge_test(input_1, expected_1)
+    hash_merge_test(input_1, expected_1)
 
     # now test if they properly merge when sorting
-    uris_2 = ["50", "4", "5", "4", "6", "56", "1", "50"]
-    songs_2 = generate_testing_songs(uris_2)
+    input_2 = ["50", "4", "5", "4", "6", "56", "1", "50"]
+    expected_2 = ["1", "56", "4", "5", "6", "50"]
+
+    basic_merge_test(input_2, expected_2)
+    hash_merge_test(input_2, expected_2)
 
 
 
 if __name__ == "__main__":
-    merge_sort_testing()
+    basic_merge_sort_testing()

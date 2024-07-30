@@ -3,23 +3,23 @@ from typing import List
 
 @dataclass
 class Artist:
-    name:str
-    uri:str
+    name:str = None
+    uri:str = None
 
 @dataclass 
 class Song:
-    name:str
-    uri:str
-    artists: List[Artist]
-    duration_s: int 
+    name:str = None
+    uri:str = None
+    artists: List[Artist] = None
+    duration_s: int = None 
 
 @dataclass
 class Artist_Stat:
-    artist:Artist
-    total_s: int
-    total_songs: int
-    total_playlists:int # how many unique playlists out of 1 million this artist was on 
-    weighted_listens: int # summation of each listen multiplied by the followers of that song artist
+    artist:Artist = None
+    total_s: int = None
+    total_songs: int = None
+    total_playlists:int = None # how many unique playlists out of 1 million this artist was on 
+    weighted_listens: int = None # summation of each listen multiplied by the followers of that song artist
 
 @dataclass
 class Song_Stat:
