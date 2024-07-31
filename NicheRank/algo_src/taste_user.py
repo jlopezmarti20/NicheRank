@@ -5,13 +5,12 @@ from typing import List, Tuple, Dict
 import json_parsing
 import music_dataclass as md
 
-"""
-    insert a spotify listening history json file and store, then output top songs, top artists etc
-
-"""
-
 default_recently_played = "idk" #! change this to config data!
 
+
+# we need an extractor class to extract stats from just songs
+
+# storage and loading of users taste
 class User_Taste():
 
 
@@ -20,10 +19,9 @@ class User_Taste():
     
     """
 
-    def __init__(self, spotify_history_file:str) -> None:
+    def __init__(self, song_history:md.Song) -> None:
         # history_location: string of where spotify json file is
-        self.spotify_history_file = spotify_history_file 
-        self.artist = []
+        self.artist_stats = 
         self.songs_metrics = None
 
         pass
