@@ -2,23 +2,27 @@ import os
 from tqdm import tqdm
 import time
 from typing import List, Tuple, Dict
-
-import music_dataclass as md
 import json_parsing
 import cProfile
 import pstats
 from io import StringIO
 import json
 
+import music_dataclass as md
+from extraction import Stats_Extractor
+
 
 """
-    This class takes in a database_path and outputs a dictionary of uid to the stat associated to it
+    from dataset location, returns dictionary of uid to the stat associated to it
     
 """
 
-class Dataset_Stats_Extractor():
 
-    def __init__(self, database_path, sorting_algorithm="map", profile=False) -> None:
+
+# behavior class
+class Dataset_Manager():
+
+    def __init__(self, database_path, profile=False) -> None:
         
         """
             playlist_path: path to the database file
@@ -27,7 +31,6 @@ class Dataset_Stats_Extractor():
             profile: if to profile and track sorting time
         """
         self.database_path = database_path 
-        self.sorting_algorithm = sorting_algorithm
         self.profile = profile
         self.save_location = "NicheRank/algo_src/playlist_stats"
 
@@ -52,45 +55,20 @@ class Dataset_Stats_Extractor():
         slices: List[str] = os.listdir(data_dir)
         artist_dict: Dict[str, md.Artist_Stat] = {} # artist_uri: Artist_Stat dataclass
         slice_range = tqdm(range(endslice + 1), disable= not self.profile)
-        
-        if self.profile:
-            pr = cProfile.Profile()
-            pr.enable()
-            start_time = time.time()
+        extractor = Stats_Extractor()
 
         for i in slice_range:
             # current slice has playlists 
             cur_slice = slices[i]
             cur_slice_path = os.path.join(data_dir, cur_slice)
-            playlists: List[Tuple[int, md.Song]] = json_parsing.load_slice(cur_slice_path,json_parse)
+            playlists: List[Tuple[int, List[md.Song]]] = json_parsing.load_slice(cur_slice_path,json_parse)
             
             for j, (followers, playlist) in enumerate(playlists):
                 if i == endslice and j == num_playlists % 1000:
                     # for processing final slice
                     break
-                artist_seen = set()
-                for song in playlist:
-                    for artist in song.artists:
-                        if artist.uri not in artist_dict:
-                            artist_dict[artist.uri] = md.Artist_Stat(artist=artist, total_s=0, total_songs=0, weighted_listens= 0, total_playlists=0)
-                        artist_dict[artist.uri].total_s += song.duration_s
-                        artist_dict[artist.uri].weighted_listens += followers
-                        artist_dict[artist.uri].total_songs += 1
-                        if artist.uri not in artist_seen:
-                            artist_dict[artist.uri].total_playlists += 1
-                            artist_seen.add(artist.uri)
+                extractor(playlist, artist_dict, stat_type="artist", followers=followers)
 
-        if (self.profile):
-            end_time = time.time()
-            finish = end_time - start_time
-            print(f"finished loading artists from {num_playlists} playlists in {finish:.2f} seconds")
-            pr.disable()
-            s = StringIO()
-            ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
-            ps.print_stats()
-
-            # Print the profile output
-            print(s.getvalue())
         if save:
             self.save_artist_stats(artist_dict, num_playlists)
         return artist_dict        
@@ -112,39 +90,19 @@ class Dataset_Stats_Extractor():
         slices: List[str] = os.listdir(data_dir)
         songs_dict: Dict[str, md.Song_Stat] = {} # song_uri: song_stat dataclass
         slice_range = tqdm(range(endslice + 1), disable=not self.profile)
-
-        if self.profile:
-            start_time = time.time()
-            pr = cProfile.Profile()
-            pr.enable()
+        extractor = Stats_Extractor()
 
         for i in slice_range:
             cur_slice = slices[i]
             cur_slice_path = os.path.join(data_dir, cur_slice)
-            playlists: List[Tuple[int, md.Song]] = json_parsing.load_slice(cur_slice_path,json_parse)
+            playlists: List[Tuple[int, List[md.Song]]] = json_parsing.load_slice(cur_slice_path,json_parse)
 
             for j, (followers, playlist) in enumerate(playlists):
                 if i == endslice and j == num_playlists % 1000:
                     break
 
-                for song in playlist:
-                    if song.uri not in songs_dict:
-                        song_stat = md.Song_Stat(song=song, total_listens=0, weighted_listens=0)
-                        songs_dict[song.uri] = song_stat
-                    songs_dict[song.uri].total_listens += 1
-                    songs_dict[song.uri].weighted_listens += followers
+                extractor(playlist, songs_dict, stat_type="song", followers=followers)
                     
-        if (self.profile):
-            end_time = time.time()
-            finish = end_time - start_time
-            print(f"finished loading songs from {num_playlists} playlists in {finish:.2f} seconds")
-            pr.disable()
-            s = StringIO()
-            ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
-            ps.print_stats()
-
-            # Print the profile output
-            print(s.getvalue())
         if save:
             self.save_song_stats(songs_dict, num_playlists)
         return songs_dict
@@ -163,15 +121,16 @@ class Dataset_Stats_Extractor():
         with open(save_path, "w") as f:
             json.dump(json_sample, f)
 
+
 def example_main():
 
     # get an example of like 100 or so playlists and stats
     dataset_location = "/media/mattyb/UBUNTU 22_0/P3-template-main/spotify_million_playlist_dataset"
 
-    extractor = Dataset_Stats_Extractor(dataset_location)
+    manager = Dataset_Manager(dataset_location)
 
-    artist_stats = extractor.load_artist_stats(load_percent=0.05, save=True) 
-    song_stats = extractor.load_song_stats(load_percent=0.05, save=True)
+    artist_stats = manager.load_artist_stats(load_percent=0.05, save=True) 
+    song_stats = manager.load_song_stats(load_percent=0.05, save=True)
 
 
 
