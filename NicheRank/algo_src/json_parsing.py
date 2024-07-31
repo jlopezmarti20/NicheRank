@@ -13,15 +13,7 @@ def parse_spotify_history_json(response_path:str)->List[md.Song]:
     """
         parse playlist spotify into a list of dictionaries of song stats 
         see https://developer.spotify.com/documentation/web-api/reference/get-recently-played for more on responses
-        return: 
-            [
-                {
-                    song_name: str,
-                    artists: [artist_name],
-                    song_uri: string
-                    duration_s: int                    
-                }
-            ]
+        return: List[md.Song]
     """
 
     with open(response_path, "r") as f:

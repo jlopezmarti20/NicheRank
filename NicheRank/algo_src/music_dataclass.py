@@ -25,19 +25,6 @@ class Artist_Stat:
 class Song_Stat:
     song:Song
     total_listens:int
-    weighted_listens:int
+    weighted_listens:int # playlists with higher followers give this more
 
-
-"""
-    SCORING_FUNCTIONS????
-"""
-
-
-def basic_score(song_stat:Song_Stat):
-    # Simply return which has more songs
-    return song_stat.total_listens
-
-def weighted_score(song_stat:Song_Stat, multi=0.6):
-    # idk
-    return multi * song_stat.weighted_listens + song_stat.total_listens
 

@@ -11,11 +11,11 @@ from io import StringIO
 
 
 """
-    This class takes in the database path and returns a dictionary of 
+    This class takes in a database_path and outputs a dictionary of uid to the stat associated to it
     
 """
 
-class Artiststats_Playlist_Loader():
+class Playlist_Artist_Stats_Creator():
 
     def __init__(self, database_path, sorting_algorithm="map", profile=False) -> None:
         
@@ -94,7 +94,7 @@ class Artiststats_Playlist_Loader():
             print(s.getvalue())
         return artist_dict
 
-class Songstats_Playlist_Loader():
+class Playlist_Songstats_Creator():
 
     def __init__(self, database_path, sorting_algorithm="map", profile=False) -> None:
         
@@ -167,31 +167,3 @@ class Songstats_Playlist_Loader():
             # Print the profile output
             print(s.getvalue())
         return songs_dict
-
-
-def test_song_load(database):
-
-    playlist_handler = Songstats_Playlist_Loader(database_path=database, profile=True)
-    song_stats_dict = playlist_handler.load_song_stats(load_percent=0.1)
-
-def test_artist_load(database):
-
-    playlist_handler = Artiststats_Playlist_Loader(database_path=database, profile=True)
-    artist_stats_dict = playlist_handler.load_artist_stats(load_percent=0.1)
-
-def test_edge_song_load(database):
-    playlist_handler = Songstats_Playlist_Loader(database_path=database, profile=True)
-    song_stats_dict = playlist_handler.load_song_stats(load_percent=1)
-
-
-def test_edge_artist_load(database):
-    playlist_handler = Artiststats_Playlist_Loader(database_path=database, profile=True)
-    artist_stats_dict = playlist_handler.load_artist_stats(load_percent=1)
-
-def test():
-
-    database_path = "/media/mattyb/UBUNTU 22_0/P3-template-main/spotify_million_playlist_dataset"
-    test_song_load(database_path)
-
-if __name__ == "__main__":
-    test()

@@ -1,5 +1,5 @@
 from typing import Any
-from user_taste import User_Listening_Profile
+from NicheRank.algo_src.taste_user import User_Listening_Profile
 
 """
     Global Taste takes in the million playlists database and 
@@ -14,4 +14,7 @@ class Global_Taste():
     def __init__(self) -> None:
         pass
 
-
+    def process_playlists(self, playlist_path)->None:
+        """
+            Generate a ranking of playlists using your own popularity metric
+        """
