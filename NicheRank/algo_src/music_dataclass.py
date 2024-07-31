@@ -18,7 +18,7 @@ class Artist:
 class Song:
     name:str = None
     uri:str = None
-    artists: List[Artist] = None
+    artists: List[Artist] = []
     duration_s: int = None 
 
     def __eq__(self, other: object) -> bool:
@@ -56,7 +56,7 @@ class Artist_Stat:
         )
     
     def __eq__(self, other) -> bool:
-        if self.artist.uri == other.artist.uri:
+        if self.artist == other.artist:
             return True
         else:
             return False
@@ -88,36 +88,8 @@ class Song_Stat:
         if self.song == other.song:
             return True
         else:
-            return False
+            return False        
 
-def convert_music_to_dict(music)-> dict:
-    if isinstance(music, Song_Stat):
-        return {
-            'song': convert_music_to_dict(music.song),
-            'total_listens': music.total_listens,
-            'weighted_listens': music.weighted_listens
-        }
-    
-    elif isinstance(music, Artist_Stat):
-
-        return {
-            'artist':convert_music_to_dict(music.artist),
-            'total_s': music.total_s,
-            'total_songs': music.total_songs,
-            'total_playlists': music.total_playlists,
-            'weighted_listens': music.weighted_listens
-        }
-        
-    elif isinstance(music, Song):
-        return {
-            'name': music.name,
-            'uri': music.uri,
-            'artists': [convert_music_to_dict(artist) for artist in music.artists],
-            'duration_s': music.duration_s
-        }
-
-    elif isinstance(music, Artist):
-        return asdict(music)
 
 def calculate_artist_popularity(artist_stat:Artist_Stat):
     # simple popularity metric
