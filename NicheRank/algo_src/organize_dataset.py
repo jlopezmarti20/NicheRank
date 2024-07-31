@@ -8,6 +8,7 @@ import json_parsing
 import cProfile
 import pstats
 from io import StringIO
+import json
 
 
 """
@@ -15,7 +16,7 @@ from io import StringIO
     
 """
 
-class Playlist_Artist_Stats_Creator():
+class Dataset_Stats_Extractor():
 
     def __init__(self, database_path, sorting_algorithm="map", profile=False) -> None:
         
@@ -28,15 +29,13 @@ class Playlist_Artist_Stats_Creator():
         self.database_path = database_path 
         self.sorting_algorithm = sorting_algorithm
         self.profile = profile
-
-        self.global_song_stats = None
-        self.global_artist_stats = None
+        self.save_location = "NicheRank/algo_src/playlist_stats"
 
         # check if database path exists
         if (not os.path.exists(self.database_path)):
             raise IOError(f'File doesnt exist: {self.database_path}')
         
-    def load_artist_stats(self, load_percent=0.5,json_parse="fast") -> Dict[str, md.Artist_Stat]:
+    def load_artist_stats(self, load_percent=0.5,json_parse="fast", save=False) -> Dict[str, md.Artist_Stat]:
         """
             creates a list of artist stats (unordered) 
         """
@@ -92,31 +91,12 @@ class Playlist_Artist_Stats_Creator():
 
             # Print the profile output
             print(s.getvalue())
-        return artist_dict
 
-class Playlist_Songstats_Creator():
-
-    def __init__(self, database_path, sorting_algorithm="map", profile=False) -> None:
+        if save:
+            self.save_song_stats(artist_dict, num_playlists)
+        return artist_dict        
         
-        """
-            playlist_path: path to the database file
-            load_percent: what percent of the million databases to load (default is max)
-            sorting_algorithm: which sorting algorithm to use for this ("map", "merge") are 2 
-            profile: if to profile and track sorting time
-        """
-        self.database_path = database_path 
-        self.sorting_algorithm = sorting_algorithm
-        self.profile = profile
-
-        self.global_song_stats = None
-        self.global_artist_stats = None
-
-        # check if database path exists
-        if (not os.path.exists(self.database_path)):
-            raise IOError(f'File doesnt exist: {self.database_path}')
-        
-        
-    def load_song_stats(self, load_percent=0.5, json_parse="fast") -> Dict[str, md.Song_Stat]:
+    def load_song_stats(self, load_percent=0.5, json_parse="fast", save=False) -> Dict[str, md.Song_Stat]:
         """
             Creates a list of song_stats (unordered)
         
@@ -166,4 +146,35 @@ class Playlist_Songstats_Creator():
 
             # Print the profile output
             print(s.getvalue())
+
+        if save:
+            self.save_song_stats(songs_dict, num_playlists)
+
         return songs_dict
+    
+    def save_song_stats(self, songs_dict, num_playlists):
+        save_name = f"song_stats_{num_playlists}.json"
+        save_path = os.path.join(self.database_path, save_name)
+        with open(save_path, "w") as f:
+            json.dump(songs_dict, f)
+
+    def save_artist_stats(self, artists_dict, num_playlists):
+        save_name = f"artist_stats_{num_playlists}.json"
+        save_path = os.path.join(self.database_path, save_name)
+        with open(save_path, "w") as f:
+            json.dump(artists_dict, f)
+
+
+def example_main():
+
+    # get an example of like 100 or so playlists and stats
+    dataset_location = "/media/mattyb/UBUNTU 22_0/P3-template-main/spotify_million_playlist_dataset"
+
+    extractor = Dataset_Stats_Extractor(dataset_location)
+
+    artist_stats = extractor.load_artist_stats(load_percent=0.3, save=True) 
+    song_stats = extractor.load_song_stats(load_percent=0.3, save=True)
+
+
+if __name__ == "__main__":
+    example_main()

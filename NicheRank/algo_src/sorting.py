@@ -11,7 +11,34 @@ import NicheRank.algo_src.popularity as pop_rank
 
 
 
-class Sort_Artists():
+class Sort_Records():
+
+    """
+
+    """
+
+    def __call__(self, records_list) -> Any:
+        if isinstance(records_list[0], md.Artist_Stat):
+            # perform an artists sort
+
+        elif isinstance(records_list[0], md.Song_Stat):
+            # perform a song records sort
+    
+    def sort_artists_records():
+
+        pass
+
+    def sort_song_records():
+
+        pass
+
+
+class Sort_Artists_Records():
+
+    """
+        Sorts Artist Stats according to some metric!
+    
+    """
 
     def __init__(self) -> None:
         pass
