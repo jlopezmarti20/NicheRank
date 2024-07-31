@@ -161,7 +161,7 @@ class Dataset_Stats_Extractor():
         save_path = os.path.join(self.database_path, save_name)
         json_sample = json.dumps(artists_dict, cls=json_parsing.CustomJSONEncoder, indent=4)
         with open(save_path, "w") as f:
-            json.dump(artists_dict, f)
+            json.dump(json_sample, f)
 
 def example_main():
 
