@@ -91,9 +91,8 @@ class Dataset_Stats_Extractor():
 
             # Print the profile output
             print(s.getvalue())
-
         if save:
-            self.save_song_stats(artist_dict, num_playlists)
+            self.save_artist_stats(artist_dict, num_playlists)
         return artist_dict        
         
     def load_song_stats(self, load_percent=0.5, json_parse="fast", save=False) -> Dict[str, md.Song_Stat]:
@@ -146,24 +145,23 @@ class Dataset_Stats_Extractor():
 
             # Print the profile output
             print(s.getvalue())
-
         if save:
             self.save_song_stats(songs_dict, num_playlists)
-
         return songs_dict
     
     def save_song_stats(self, songs_dict, num_playlists):
         save_name = f"song_stats_{num_playlists}.json"
+        json_sample = json.dumps(songs_dict, cls=json_parsing.CustomJSONEncoder, indent=4)
         save_path = os.path.join(self.database_path, save_name)
         with open(save_path, "w") as f:
-            json.dump(songs_dict, f)
+            json.dump(json_sample, f)
 
     def save_artist_stats(self, artists_dict, num_playlists):
         save_name = f"artist_stats_{num_playlists}.json"
         save_path = os.path.join(self.database_path, save_name)
+        json_sample = json.dumps(artists_dict, cls=json_parsing.CustomJSONEncoder, indent=4)
         with open(save_path, "w") as f:
             json.dump(artists_dict, f)
-
 
 def example_main():
 
@@ -172,8 +170,13 @@ def example_main():
 
     extractor = Dataset_Stats_Extractor(dataset_location)
 
-    artist_stats = extractor.load_artist_stats(load_percent=0.3, save=True) 
-    song_stats = extractor.load_song_stats(load_percent=0.3, save=True)
+    artist_stats = extractor.load_artist_stats(load_percent=0.05, save=True) 
+    song_stats = extractor.load_song_stats(load_percent=0.05, save=True)
+
+
+
+        
+
 
 
 if __name__ == "__main__":

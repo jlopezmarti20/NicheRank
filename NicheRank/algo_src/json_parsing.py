@@ -1,12 +1,18 @@
 import json
 import music_dataclass as md
+from typing import List, Tuple
+
 
 """
     Methods for parsing json into objects for python class use.
     This can be edited according to however the database is setup.
 
 """
-from typing import List, Tuple
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, 'to_dict'):
+            return obj.to_dict()
+        return super().default(obj)
 
 
 def parse_spotify_history_json(response_path:str)->List[md.Song]:

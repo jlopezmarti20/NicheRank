@@ -10,6 +10,84 @@ import NicheRank.algo_src.popularity as pop_rank
 """
 
 
+def pop_sort_as_basic(artist_stats: List[md.Artist_Stat])->List[md.Artist_Stat]:
+    """
+        Merge sort on artist stats using basic popularity metric
+    """
+
+    
+    pass
+
+def pop_sort_ss_basic(song_stats: List[md.Song_Stat]) -> List[md.Song_Stat]:
+    """
+        Merge sort Song Stats using basic popularity metric 
+
+    """
+
+
+def artist_merge(left: List, right: List, scoring_method:pop_rank.Artist_Scorer):
+        l = 0
+        r = 0
+        sorted = []
+
+        while(l < len(left)) and (r < len(right)):
+            comparison = compare(left[l], right[r], scoring_method)
+            if comparison == 0:
+                # combine 2 and add to both 
+                sorted.append((left[l][0] + right[r][0], left[l][1]))
+                r += 1
+                l += 1
+            elif comparison == -1 :
+                # left is larger, so add right
+                sorted.append(right[r])
+                r += 1
+
+            elif comparison == 1:
+                # right is larger, so add left 
+                sorted.append(left[l])
+                l += 1
+
+        while (l < len(left)):
+            sorted.append(left[l])
+            l += 1
+
+        while(r < len(right)):
+            sorted.append(right[r])
+            r += 1 
+
+        return sorted
+
+def _merge_sort(artist_stats:List, scoring_method):
+    if len(artist_stats) == 1:
+        return artist_stats
+    
+    mid = len(artist_stats) // 2
+    left_songs = artist_stats[:mid]
+    right_songs = artist_stats[mid:]
+    sorted_left = Sort_Artists._merge_sort(left_songs)
+    sorted_right = Sort_Artists._merge_sort(right_songs)
+
+    return Sort_Artists._merge(sorted_left, sorted_right, scoring_method) 
+
+def compare_artists(l:md.Artist_Stat, r: md.Artist_Stat, scoring_method:pop_rank.Artist_Scorer):
+    # compares 2 artist records
+
+    # -1 if left is larger, 1 if right is larger, 0 if they are the same artist
+
+    if l.artist.uri == r.artist.uri:
+        # these are the same artist stats
+        return 0
+    
+    left_pop = scoring_method(l)
+    right_pop = scoring_method(r)
+
+    if (left_pop < right_pop):
+        return 1
+    else:
+        return -1
+
+
+
 
 class Sort_Records():
 
@@ -55,66 +133,6 @@ class Sort_Artists_Records():
         else:
             return None
 
-    def _merge(left: List[md.Artist_Stat], right: List[md.Artist_Stat], scoring_method:pop_rank.Artist_Scorer):
-        l = 0
-        r = 0
-        sorted = []
-
-        while(l < len(left)) and (r < len(right)):
-            comparison = Sort_Artists._compare(left[l], right[r], scoring_method)
-            if comparison == 0:
-                # combine 2 and add to both 
-                sorted.append((left[l][0] + right[r][0], left[l][1]))
-                r += 1
-                l += 1
-            elif comparison == -1 :
-                # left is larger, so add right
-                sorted.append(right[r])
-                r += 1
-
-            elif comparison == 1:
-                # right is larger, so add left 
-                sorted.append(left[l])
-                l += 1
-
-        while (l < len(left)):
-            sorted.append(left[l])
-            l += 1
-
-        while(r < len(right)):
-            sorted.append(right[r])
-            r += 1 
-
-        return sorted
-
-    def _merge_sort(artist_stats:List[md.Artist_Stat], scoring_method:pop_rank.Artist_Scorer) -> List[Tuple[int, str]]:
-        if len(artist_stats) == 1:
-            return artist_stats
-        
-        mid = len(artist_stats) // 2
-        left_songs = artist_stats[:mid]
-        right_songs = artist_stats[mid:]
-        sorted_left = Sort_Artists._merge_sort(left_songs)
-        sorted_right = Sort_Artists._merge_sort(right_songs)
-
-        return Sort_Artists._merge(sorted_left, sorted_right, scoring_method) 
-
-    def _compare(l:md.Artist_Stat, r: md.Artist_Stat, scoring_method:pop_rank.Artist_Scorer):
-        # compares 2 artist records
-
-        # -1 if left is larger, 1 if right is larger, 0 if they are the same artist
-
-        if l.artist.uri == r.artist.uri:
-            # these are the same artist stats
-            return 0
-        
-        left_pop = scoring_method(l)
-        right_pop = scoring_method(r)
-
-        if (left_pop < right_pop):
-            return 1
-        else:
-            return -1
 
 
         
