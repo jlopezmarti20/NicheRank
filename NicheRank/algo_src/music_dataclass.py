@@ -1,28 +1,31 @@
 from dataclasses import dataclass, asdict
 from typing import List
 
+
+# data class
 @dataclass
 class Artist:
     name:str = None
     uri:str = None
-    def to_dict(self):
-        return asdict(self)
+
+    def __eq__(self, other: object) -> bool:
+        if self.uri == other.uri:
+            return True
+        else:
+            return False
 
 @dataclass 
 class Song:
     name:str = None
     uri:str = None
-    artists: List[Artist] = None
+    artists: List[Artist] = []
     duration_s: int = None 
 
-    def to_dict(self):
-        return{
-            'name': self.name,
-            'uri': self.uri,
-            'artists': [artist.to_dict() for artist in self.artists],
-            'duration_s': self.duration_s
-        }
-    
+    def __eq__(self, other: object) -> bool:
+        if self.uri == other.uri:
+            return True
+        else:
+            return False
 
 @dataclass
 class Artist_Stat:
@@ -31,16 +34,9 @@ class Artist_Stat:
     total_songs: int = None
     total_playlists:int = None # how many unique playlists out of 1 million this artist was on 
     weighted_listens: int = None # summation of each listen multiplied by the followers of that song artist
-    def to_dict(self):
-        return {
-            'artist': self.artist.to_dict(),
-            'total_s': self.total_s,
-            'total_songs': self.total_songs,
-            'total_playlists': self.total_playlists,
-            'weighted_listens': self.weighted_listens
-        }
 
-    def popularity(self):
+    @property
+    def popularity(self)->float:
         return calculate_artist_popularity(self)
 
     def get_uri(self):
@@ -58,6 +54,12 @@ class Artist_Stat:
             total_playlists=self.total_playlists + other.total_playlists,
             weighted_listens=self.weighted_listens + other.weighted_listens
         )
+    
+    def __eq__(self, other) -> bool:
+        if self.artist == other.artist:
+            return True
+        else:
+            return False
 
 @dataclass
 class Song_Stat:
@@ -65,14 +67,8 @@ class Song_Stat:
     total_listens:int
     weighted_listens:int # playlists with higher followers give this more
     
-    def to_dict(self):
-        return {
-            'song': self.song.to_dict(),
-            'total_listens': self.total_listens,
-            'weighted_listens': self.weighted_listens
-        }
-    
-    def popularity(self):
+    @property
+    def popularity(self)->float:
         return calculate_song_popularity(self)
     
     def get_uri(self):
@@ -88,6 +84,11 @@ class Song_Stat:
             total_listens=self.total_listens + other.total_listens,
             weighted_listens=self.weighted_listens + other.weighted_listens,
         )
+    def __eq__(self, other: object) -> bool:
+        if self.song == other.song:
+            return True
+        else:
+            return False        
 
 
 def calculate_artist_popularity(artist_stat:Artist_Stat):
