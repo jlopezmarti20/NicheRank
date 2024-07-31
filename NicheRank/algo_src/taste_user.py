@@ -1,5 +1,7 @@
 
 import os
+from typing import List, Tuple, Dict
+
 import json_parsing
 import music_dataclass as md
 
@@ -10,36 +12,27 @@ import music_dataclass as md
 
 default_recently_played = "idk" #! change this to config data!
 
-class User_Listening_Stats():
+class User_Taste():
 
-    def __init__(self, spotify_history:str) -> None:
+
+    """
+        Loads and handles an individuals spotify taste
+    
+    """
+
+    def __init__(self, spotify_history_file:str) -> None:
         # history_location: string of where spotify json file is
-        self.spotify_history = spotify_history 
-        self.artists_metrics = None
+        self.spotify_history_file = spotify_history_file 
+        self.artist = []
         self.songs_metrics = None
 
         pass
 
-    def process_user_stats(self)->None:
+    def process_user_history(self, song_history: List[md.Song])->None:
         # TODO process and store a users favorite artists based on time listened  
-        track_list = json_parsing.process_spotify_recently_played(self.recently_played)
-        
-        """
-            Track_List:             
-            [
-                {
-                    song_name: str,
-                    artists: [artist_name],
-                    song_id: string
-                    duration_s: int                    
-                }
-            ]
-        """
-        song_history:list[md.Song] = json_parsing.parse_spotify_history_json(self.spotify_history)
-        # updates artist_metrics and songs_metrics by going through track list
-        
-
-        pass
+        pass        
+        # sort this list with merge sort?
+        # put this list into a heap?
 
     def get_favorite_artists(self, n=None):
         # Return n favorite artists
