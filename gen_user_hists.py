@@ -14,7 +14,7 @@ from typing import List
 
 """
 
-def convert_to_spotify_response(songs: List[Song], ):
+def convert_to_spotify_response(songs: List[Song]):
     # converts a song into a dictionary that is similar to a spotify song request
 
     response = {
@@ -30,10 +30,12 @@ def convert_to_spotify_response(songs: List[Song], ):
             } for artist in song.artists]
 
         track_dict = {
-            "artists": artists_list,
-            "duration_ms": song.duration_s*1000,
-            "name": song.name,
-            "uri": song.uri
+            "track": {
+                "artists": artists_list,
+                "duration_ms": song.duration_s*1000,
+                "name": song.name,
+                "uri": song.uri
+            }
         }
         response["items"].append(track_dict)
 
