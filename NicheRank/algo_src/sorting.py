@@ -92,14 +92,14 @@ class Local_Sort():
                 return 1
 
 
-class Popularity_Sort():
+class Global_Sort():
 
     """
         Popularity sort sorts decending by seeing which Stats more popular in Global Taste
     """
 
     def merge_sort(stats_list:List[Union[md.Artist_Stat, md.Song_Stat]], music_map):
-        return Popularity_Sort._merge_sort_stats(stats_list, music_map)
+        return Global_Sort._merge_sort_stats(stats_list, music_map)
 
     def _merge_sort_stats(stats_list:List[Union[md.Artist_Stat, md.Song_Stat]], music_map):
         
@@ -109,10 +109,10 @@ class Popularity_Sort():
         mid = len(stats_list) // 2
         left_songs = stats_list[:mid]
         right_songs = stats_list[mid:]
-        sorted_left = Popularity_Sort._merge_sort_stats(left_songs, music_map)
-        sorted_right = Popularity_Sort._merge_sort_stats(right_songs, music_map)
+        sorted_left = Global_Sort._merge_sort_stats(left_songs, music_map)
+        sorted_right = Global_Sort._merge_sort_stats(right_songs, music_map)
 
-        return Popularity_Sort._merge_stats(sorted_left, sorted_right, music_map) 
+        return Global_Sort._merge_stats(sorted_left, sorted_right, music_map) 
         
     def _merge_stats(left: List, right: List, music_map) -> List[Union[md.Song_Stat, md.Artist_Stat]]:
             
@@ -122,7 +122,7 @@ class Popularity_Sort():
 
             while(l < len(left)) and (r < len(right)):
                 
-                comparison = Popularity_Sort.global_compare(l, r, music_map)
+                comparison = Global_Sort.global_compare(l, r, music_map)
                 if comparison == 0:
                     # combine 2 and add to both 
                     # THESE SHOULD REALLY BE CLASSES not dataclasses lololol FUCKKK

@@ -1,9 +1,8 @@
 from typing import Dict, List
 from dataclasses import dataclass
 
-import taste_user as ut
 import music_dataclass as md
-from sorting import Local_Sort, Popularity_Sort
+from sorting import Local_Sort, Global_Sort
 from extraction import Stats_Extractor
 
 """
@@ -46,7 +45,7 @@ class Mainstream_Engine():
         favorite_artists: List[md.Artist_Stat] = Local_Sort.merge_sort(artist_history_stats)
 
         if global_AS_map is not None:
-            popular_artists: List[md.Artist_Stat] = Popularity_Sort.merge_sort(artist_history_stats, global_AS_map)
+            popular_artists: List[md.Artist_Stat] = Global_Sort.merge_sort(artist_history_stats, global_AS_map)
             least_popular_artists = popular_artists.reverse()
 
         # get song metrics
@@ -54,7 +53,7 @@ class Mainstream_Engine():
         favorite_songs: List[md.Song_Stat] = Local_Sort.merge_sort(song_history_stats)
 
         if global_SS_map is not None:
-            popular_songs = Popularity_Sort.merge_sort(song_history_stats, global_SS_map)  
+            popular_songs = Global_Sort.merge_sort(song_history_stats, global_SS_map)  
 
         time_listened_s = sum(artist_stat.total_s for artist_stat in artist_history_stats)
         pop_score = Mainstream_Engine.calculate_mainstream_score()
@@ -77,3 +76,12 @@ class Mainstream_Engine():
         for i, (artist_stat) in enumerate(fav_AS_sorted):
             # smaller i is, more popular artist is 
             pass
+
+    def grouping_based_allignment():
+
+        """
+            Sections into n groups that represent "popularity tiers" and then
+            gives popularity score based off that tier
+        """
+
+        pass
