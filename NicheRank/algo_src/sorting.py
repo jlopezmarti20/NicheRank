@@ -14,7 +14,7 @@ class Local_Sort():
     def merge_sort(stats_list:List[Union[md.Song_Stat, md.Artist_Stat]]):
         return Local_Sort._merge_sort_stats(stats_list)
     
-    def heap_sort(stats_list:List[Union[md.Song_Stat, md.Artist_Stat]]):
+    def quick_sort(stats_list:List[Union[md.Song_Stat, md.Artist_Stat]]):
         # TODO
 
         pass

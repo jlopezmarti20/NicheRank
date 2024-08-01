@@ -1,6 +1,6 @@
 import file_management as fm
 import music_dataclass as md
-from analyze_history import Mainstream_Engine, User_Metrics, print_metric
+from analyze_history import Mainstream_Engine, User_Metrics
 
 from typing import List, Dict
 import os

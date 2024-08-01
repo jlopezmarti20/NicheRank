@@ -1,5 +1,7 @@
 from dataclasses import dataclass, asdict, field
-from typing import List
+from typing import List, Dict
+
+from sorting import Local_Sort
 
 
 # data class
@@ -105,3 +107,32 @@ def calculate_song_popularity(song_stat:Song_Stat):
     weighted_score = song_stat.weighted_listens*a
     unweighted_score = song_stat.total_listens
     return weighted_score + unweighted_score
+
+def calculate_percentile(user_AS:List[Artist_Stat], global_AS_map: Dict[str, Artist_Stat]):
+
+        sum_pop_artists = 0
+
+        for artist in user_AS:
+            artist_global_weight = global_AS_map[artist.get_uri()].popularity
+            
+            if artist_global_weight == None:
+                # if the artists isnt on the list, they must not be popular
+                artist_global_weight = 0
+
+            sum_pop_artists += artist.total_songs * artist_global_weight
+
+        avg_artist_pop = sum_pop_artists/len(user_AS)
+
+        # now lets find the percentile of this! 
+        global_AS_list = [artist_stat for uri, artist_stat in global_AS_map.items()]
+        top_artists: List[Artist_Stat] = Local_Sort.merge_sort(global_AS_list)
+
+        j = 0
+        for (artist_stat) in top_artists:
+            j += 1
+            if artist_stat.popularity > avg_artist_pop:
+                # we found where this artists placement is 
+                break
+
+        percentile = j/len(top_artists)
+        return percentile
