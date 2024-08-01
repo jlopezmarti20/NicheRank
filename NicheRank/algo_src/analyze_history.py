@@ -59,6 +59,34 @@ def print_metric(metric):
         print(f"    most favorite songs: ")
         fav_artists = metric.favorites[:10] if num_artists >= 10 else metric.most_popular[:num_artists]
 
+def calculate_percentile(user_AS:List[md.Artist_Stat], global_AS_map: Dict[str: md.Artist_Stat]):
+
+        sum_pop_artists = 0
+
+        for artist in user_AS:
+            artist_global_weight = global_AS_map[artist.get_uri()]
+            
+            if artist_global_weight == None:
+                # if the artists isnt on the list, they must not be popular
+                artist_global_weight = 0
+
+            sum_pop_artists += artist.total_songs * artist_global_weight
+
+        avg_artist_pop = sum_pop_artists/len(user_AS)
+
+        # now lets find the percentile of this! 
+        global_AS_list = [artist_stat for uri, artist in global_AS_map.items()]
+        top_artists: List[md.Artist_Stat] = Local_Sort.merge_sort(global_AS_list)
+
+        j = 0
+        for (artist_stat) in top_artists:
+            j += 1
+            if artist_stat.popularity > avg_artist_pop:
+                # we found where this artists placement is 
+                break
+
+        percentile = j/len(top_artists)
+        return percentile
 
 # Behavior Class
 class Mainstream_Engine():
@@ -97,26 +125,11 @@ class Mainstream_Engine():
         song_met = Song_Metrics(favorites=favorite_songs, most_popular=popular_songs, num_listened=len(favorite_songs))
         
         return song_met
+ 
+    def calculate_mainstream_score(self):
 
-
-    def calculate_mainstream_score(self) -> float:
-        # Finds your mainstream score based off of your artists listening history
-
-
-        return 0
-
-    def list_allignment_MS(fav_AS_sorted: List[md.Artist_Stat], popularity_sorted) -> float:
-        # compares 2 lists sorted by favorite vs popularity to see how well they are alligned.
-        pass
-
-    def global_map_allignment_MS(fav_AS_sorted: List[md.Artist_Stat], AS_global_map, total_listens) -> float:
-        # calculates based off how much you listen to an artist
-        total_global_songs = sum( artist.total_songs for uri, artist in AS_global_map.items()) 
-        
-        score = 0
-        for i, (artist_stat) in enumerate(fav_AS_sorted):
-            # smaller i is, more popular artist is 
-            pass
+        # use calculate_percentile
+        return
 
     def grouping_based_allignment():
 
