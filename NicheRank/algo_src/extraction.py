@@ -4,8 +4,8 @@ import music_dataclass as md
 
 
 """
-    Stats Extractor takes a list of songs and extracts
-    either Song_Stats into a dict, or Artist_Stats
+    Stats Extractor takes a list of songs and returns a Dict of 
+    the URI to Music Object
 
 """
 
@@ -32,7 +32,7 @@ class Stats_Extractor():
     
     def history_SS_extract(songs: List[md.Song]) -> List[md.Song_Stat]:
         SS_dict = {}
-        Stats_Extractor.extract_artiststats(songs, SS_dict, 1)
+        Stats_Extractor.extract_songstats(songs, SS_dict, 1)
         return [stat for uri, stat in SS_dict.items()]    
 
     def extract_songstats(songs:List[md.Song], song_stats_dict: Dict[str, md.Song_Stat], followers):
