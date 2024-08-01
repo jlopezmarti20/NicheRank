@@ -65,8 +65,8 @@ class Mainstream_Engine():
 
     def __init__(self, history: List[md.Song], global_artists_stat_map: Dict[str, md.Artist_Stat], global_song_stat_map: Dict[str, md.Song_Stat]) -> None:
         self.song_history = history
-        self.history_artist_stats: List[md.Artist_Stat] = Stats_Extractor.history_AS_extract(history)
-        self.history_song_stats: List[md.Song_Stat] = Stats_Extractor.history_SS_extract(history)
+        self.history_artist_stats: List[md.Artist_Stat] = Stats_Extractor.extract_artist_stats_from_songs(history)
+        self.history_song_stats: List[md.Song_Stat] = Stats_Extractor.extract_song_stats_from_songs(history)
 
         self.g_artists_map = global_artists_stat_map
         self.g_song_map = global_song_stat_map

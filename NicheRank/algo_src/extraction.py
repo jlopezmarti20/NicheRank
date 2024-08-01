@@ -11,7 +11,8 @@ import music_dataclass as md
 
 class Stats_Extractor():
 
-    def history_AS_extract(songs: List[md.Song]) -> List[md.Artist_Stat]:
+    def extract_artist_stats_from_songs(songs: List[md.Song]) -> List[md.Artist_Stat]:
+        # extract artist stats from songs
         AS_dict = {}
         Stats_Extractor.extract_artiststats(songs, AS_dict, 1)
         return [stat for uri, stat in AS_dict.items()]
@@ -30,7 +31,7 @@ class Stats_Extractor():
                     artist_stats_dict[artist.uri].total_playlists += 1
                     seen_artists.add(artist.uri)
     
-    def history_SS_extract(songs: List[md.Song]) -> List[md.Song_Stat]:
+    def extract_song_stats_from_songs(songs: List[md.Song]) -> List[md.Song_Stat]:
         SS_dict = {}
         Stats_Extractor.extract_songstats(songs, SS_dict, 1)
         return [stat for uri, stat in SS_dict.items()]    
