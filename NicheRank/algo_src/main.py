@@ -33,7 +33,8 @@ def main():
     global_songstats = get_global_songstats()
     global_artiststats = get_global_artiststats()
 
-    metrics: User_Metrics = Mainstream_Engine.analyze_history(user_song_hist, global_artiststats, global_songstats) 
+    user_engine = Mainstream_Engine(user_song_hist, global_artiststats, global_songstats)
+    metrics: User_Metrics = user_engine.analyze_history()
     pass
 
 

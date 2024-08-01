@@ -98,7 +98,7 @@ class Global_Sort():
         Popularity sort sorts decending by seeing which Stats more popular in Global Taste
     """
 
-    def merge_sort(stats_list:List[Union[md.Artist_Stat, md.Song_Stat]], music_map):
+    def merge_sort(stats_list:List[Union[md.Artist_Stat, md.Song_Stat]], music_map) -> List[Union[md.Artist_Stat, md.Song_Stat]]:
         return Global_Sort._merge_sort_stats(stats_list, music_map)
 
     def _merge_sort_stats(stats_list:List[Union[md.Artist_Stat, md.Song_Stat]], music_map):
