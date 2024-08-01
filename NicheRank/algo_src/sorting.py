@@ -27,7 +27,7 @@ class Local_Sort():
             sorted = []
 
             while(l < len(left)) and (r < len(right)):
-                comparison = Local_Sort.compare_obj(left[l], right[r])
+                comparison = Local_Sort._compare_obj(left[l], right[r])
                 if comparison == 0:
                     # combine 2 and add to both 
                     # THESE SHOULD REALLY BE CLASSES not dataclasses lololol FUCKKK

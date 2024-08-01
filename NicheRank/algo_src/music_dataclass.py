@@ -1,4 +1,4 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from typing import List
 
 
@@ -18,7 +18,7 @@ class Artist:
 class Song:
     name:str = None
     uri:str = None
-    artists: List[Artist] = []
+    artists: List[Artist] = field(default_factory=list)
     duration_s: int = None 
 
     def __eq__(self, other: object) -> bool:
