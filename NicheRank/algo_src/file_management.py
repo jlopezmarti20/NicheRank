@@ -1,8 +1,11 @@
 import json
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Union
 import os
 from dataclasses import asdict
 from tqdm import tqdm
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import music_dataclass as md
 from extraction import Stats_Extractor
@@ -13,13 +16,13 @@ from extraction import Stats_Extractor
 
 """
 
-def json_to_music_dict(json_path) -> Dict:
-    # factory for creating global taste given a artist_stats url
+def global_playlist_to_music_dict(stats_json_path) -> Dict[str, Union[md.Artist_Stat, md.Song_Stat]]:
+    # returns a already extracted playlist and returns a dict of each uri and its associated stats
 
-    with open(json_path, 'r') as f:
+    with open(stats_json_path, 'r') as f:
         json_data = json.load(f)
 
-    return {uri : convert_dict_to_music(music_dict) for uri, music_dict in json_data}
+    return {uri : convert_dict_to_music(music_dict) for uri, music_dict in json_data.items()}
 
 
 def convert_dict_to_music(json_dict):

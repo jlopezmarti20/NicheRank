@@ -14,7 +14,7 @@ class Stats_Extractor():
     def history_AS_extract(songs: List[md.Song]) -> List[md.Artist_Stat]:
         AS_dict = {}
         Stats_Extractor.extract_artiststats(songs, AS_dict, 1)
-        return [stat for uri, stat in AS_dict.items]
+        return [stat for uri, stat in AS_dict.items()]
 
     def extract_artiststats(songs:List[md.Song], artist_stats_dict:Dict[str, md.Artist_Stat], followers):
         seen_artists = set()
@@ -33,7 +33,7 @@ class Stats_Extractor():
     def history_SS_extract(songs: List[md.Song]) -> List[md.Song_Stat]:
         SS_dict = {}
         Stats_Extractor.extract_artiststats(songs, SS_dict, 1)
-        return [stat for uri, stat in SS_dict.items]    
+        return [stat for uri, stat in SS_dict.items()]    
 
     def extract_songstats(songs:List[md.Song], song_stats_dict: Dict[str, md.Song_Stat], followers):
 
