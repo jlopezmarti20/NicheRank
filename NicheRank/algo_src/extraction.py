@@ -9,6 +9,8 @@ import music_dataclass as md
 
 """
 
+
+
 class Stats_Extractor():
 
     def extract_artist_stats_from_songs(songs: List[md.Song]) -> List[md.Artist_Stat]:
