@@ -63,32 +63,43 @@ def print_metric(metric):
 # Behavior Class
 class Mainstream_Engine():
 
-    def analyze_history(history: List[md.Song], global_AS_map=None, global_SS_map=None) -> User_Metrics:
+    def __init__(self, history: List[md.Song], global_artists_stat_map: Dict[str, md.Artist_Stat], global_song_stat_map: Dict[str, md.Song_Stat]) -> None:
+        self.song_history = history
+        self.history_artist_stats: List[md.Artist_Stat] = Stats_Extractor.history_AS_extract(history)
+        self.history_song_stats: List[md.Song_Stat] = Stats_Extractor.history_SS_extract(history)
 
-        # list artists ordered by listening metric descending
-        artist_history_stats: List[md.Artist_Stat] = Stats_Extractor.history_AS_extract(history) 
-        favorite_artists: List[md.Artist_Stat] = Local_Sort.merge_sort(artist_history_stats)
-        popular_artists= None
-        if global_AS_map is not None:
-            popular_artists: List[md.Artist_Stat] = Global_Sort.merge_sort(artist_history_stats, global_AS_map)
+        self.g_artists_map = global_artists_stat_map
+        self.g_song_map = global_song_stat_map
+        
 
-        # get song metrics
-        song_history_stats: List[md.Song_Stat] = Stats_Extractor.history_SS_extract(history)
-        favorite_songs: List[md.Song_Stat] = Local_Sort.merge_sort(song_history_stats)
+    def analyze_history(self) -> User_Metrics:
 
-        if global_SS_map is not None:
-            popular_songs = Global_Sort.merge_sort(song_history_stats, global_SS_map)  
-
-        time_listened_s = sum(artist_stat.total_s for artist_stat in artist_history_stats)
-        pop_score = Mainstream_Engine.calculate_mainstream_score()
-
-        artist_met = Artist_Metrics(favorites=favorite_artists,most_popular=popular_artists,num_listened=len(favorite_artists) )
-        song_met = Song_Metrics(favorites=favorite_songs, most_popular=popular_songs)
-        cur_metric = User_Metrics(artist_metrics=artist_met, song_metrics=song_met, time_listened_s=time_listened_s, pop_score=pop_score)
+        artist_metrics = self.calculate_artist_metrics()
+        song_metrics = self.calculate_song_metrics()
+        time_listened_s = sum(artist_stat.total_s for artist_stat in self.history_artist_stats)
+        pop_score = self.calculate_mainstream_score()        
+        cur_metric = User_Metrics(artist_metrics=artist_metrics, song_metrics=song_metrics, time_listened_s=time_listened_s, pop_score=pop_score)
 
         return cur_metric
+    
+    def calculate_artist_metrics(self) -> Artist_Metrics:
+        # Artist Metrics
+        favorite_artists: List[md.Artist_Stat] = Local_Sort.merge_sort(self.history_artist_stats)
+        popular_artists: List[md.Artist_Stat] = Global_Sort.merge_sort(self.history_artist_stats, self.g_artists_map)
+        artist_metrics = Artist_Metrics(favorites=favorite_artists,most_popular=popular_artists,num_listened=len(favorite_artists) )
+        return artist_metrics
+    
+    def calculate_song_metrics(self) -> Song_Metrics:
 
-    def calculate_mainstream_score(history: List[md.Song], global_AS_map: Dict[str, md.Artist_Stat]) -> float:
+        # get song metrics
+        favorite_songs: List[md.Song_Stat] = Local_Sort.merge_sort(self.history_song_stats)
+        popular_songs: List[md.Song_Stat] = Global_Sort.merge_sort(self.history_song_stats, self.g_song_map)  
+        song_met = Song_Metrics(favorites=favorite_songs, most_popular=popular_songs, num_listened=len(favorite_songs))
+        
+        return song_met
+
+
+    def calculate_mainstream_score(self) -> float:
         # Finds your mainstream score based off of your artists listening history
 
 
