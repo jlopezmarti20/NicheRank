@@ -25,15 +25,15 @@ class Local_StatSort():
             over again. However, to avoid deletions and array creation, we will need to fuse all repeats as the
             very last process in O(N) time.
         """
-        sorted_list = Local_StatSort._quicksort_stats(stats_list, 0, len(stats_list) - 1) #? O(NLog(N))
+        Local_StatSort._quicksort_stats(stats_list, 0, len(stats_list) - 1) #? O(NLog(N))
         # now that we have sorted this list, there may be repeats, so we must merge this in O(N).
         # TODO fuse together repeats in list. The list should be sorted, so this step should be simple.
-        new_list = Local_StatSort._fuse(sorted_list)
+        new_list = Local_StatSort._fuse(stats_list)
         return new_list
 
     def _quicksort_stats(stats_list: List[Union[md.Artist_Stat, md.Song_Stat]], l, r)-> None:
-        if (l == r):
-            pass
+        if (l >= r):
+            return
 
         piv = Local_StatSort._pivot(stats_list, l, r)
 
@@ -55,11 +55,13 @@ class Local_StatSort():
             while (j >= l and Local_StatSort._compare_obj(stats_list[j], stats_list[piv]) == 1):
                 # keep going left while j is smaller then piv
                 j -= 1
-
-            Local_StatSort._swap(stats_list, i, j)
+            if (i < j):
+                Local_StatSort._swap(stats_list, i, j)
 
         # swap i and pivot?
-        Local_StatSort._swap(stats_list, i)
+        Local_StatSort._swap(stats_list, i, piv)
+
+        return i # i is the new pivot
 
     def _fuse(list):
         # fusing takes an already sorted list and merges into a new on. 
@@ -205,6 +207,63 @@ class Global_StatSort():
 
     def merge_sort(stats_list:List[Union[md.Artist_Stat, md.Song_Stat]], music_map) -> List[Union[md.Artist_Stat, md.Song_Stat]]:
         return Global_StatSort._merge_sort_stats(stats_list, music_map)
+
+    def quick_sort(stats_list:List[Union[md.Song_Stat, md.Artist_Stat]], music_map):
+        """
+            Quicksort should be faster then mergesort, as we dont need to keep constructing lists over and 
+            over again. However, to avoid deletions and array creation, we will need to fuse all repeats as the
+            very last process in O(N) time.
+        """
+        Global_StatSort._quicksort_stats(stats_list, 0, len(stats_list) - 1, music_map) #? O(NLog(N))
+        # now that we have sorted this list, there may be repeats, so we must merge this in O(N).
+        # TODO fuse together repeats in list. The list should be sorted, so this step should be simple.
+        new_list = Local_StatSort._fuse(stats_list)
+        return new_list
+
+    def _quicksort_stats(stats_list: List[Union[md.Artist_Stat, md.Song_Stat]], l, r, music_map):
+        if (l >= r):
+            return
+
+        piv = Global_StatSort._pivot(stats_list, l, r, music_map)
+
+        Global_StatSort._quicksort_stats(stats_list, l, piv - 1, music_map)
+        Global_StatSort._quicksort_stats(stats_list, piv + 1, r, music_map)
+        
+
+    def _pivot(stats_list: List[Union[md.Artist_Stat, md.Song_Stat]], l, r, music_map) -> int:
+        piv = r
+        
+        i = l
+        j = r - 1
+
+        while (i < j):
+
+            while ( i < r and Global_StatSort.global_compare(stats_list[i], stats_list[piv], music_map) == -1):
+                # keep moving i right while i greater then piv
+                i += 1
+
+            while (j >= l and Global_StatSort.global_compare(stats_list[j], stats_list[piv], music_map) == 1):
+                # keep going left while j is smaller then piv
+                j -= 1
+            if (i < j):
+                Global_StatSort._swap(stats_list, i, j)
+
+        # swap i and pivot?
+        Global_StatSort._swap(stats_list, i, piv)
+
+        return i # i is the new pivot
+
+    def _fuse(list):
+        # fusing takes an already sorted list and merges into a new on. 
+        new_list = [None] * len(list)
+        # TODO make this
+        return list
+
+    def _swap(list, i, j):
+        a = list[i]
+        list[i] = list[j]
+        list[j] = a     
+
 
     def _merge_sort_stats(stats_list:List[Union[md.Artist_Stat, md.Song_Stat]], music_map):
         
