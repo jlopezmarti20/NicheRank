@@ -15,9 +15,57 @@ class Local_Sort():
         return Local_Sort._merge_sort_stats(stats_list)
     
     def quick_sort(stats_list:List[Union[md.Song_Stat, md.Artist_Stat]]):
-        # TODO
+        """
+            Quicksort should be faster then mergesort, as we dont need to keep constructing lists over and 
+            over again. However, to avoid deletions and array creation, we will need to fuse all repeats as the
+            very last process in O(N) time.
+        """
+        sorted_list = Local_Sort._quicksort_stats(stats_list, 0, len(stats_list) - 1) #? O(NLog(N))
+        # now that we have sorted this list, there may be repeats, so we must merge this in O(N).
+        # TODO fuse together repeats in list. The list should be sorted, so this step should be simple.
+        new_list = Local_Sort._fuse(sorted_list)
+        return new_list
 
-        pass
+    def _quicksort_stats(stats_list: List[Union[md.Artist_Stat, md.Song_Stat]], l, r)-> None:
+        if (l == r):
+            pass
+
+        piv = Local_Sort._pivot(stats_list, l, r)
+
+        Local_Sort._quicksort_stats(stats_list, l, piv - 1)
+        Local_Sort._quicksort_stats(stats_list, piv + 1, r)
+
+    def _pivot(stats_list: List[Union[md.Artist_Stat, md.Song_Stat]], l, r) -> int:
+        piv = r
+        
+        i = l
+        j = r - 1
+
+        while (i < j):
+
+            while ( i < r and Local_Sort._compare_obj(stats_list[i], stats_list[piv]) == -1):
+                # keep moving i right while i greater then piv
+                i += 1
+
+            while (j >= l and Local_Sort._compare_obj(stats_list[j], stats_list[piv]) == 1):
+                # keep going left while j is smaller then piv
+                j -= 1
+
+            Local_Sort._swap(stats_list, i, j)
+
+        # swap i and pivot?
+        Local_Sort._swap(stats_list, i)
+
+    def _fuse(list):
+        # fusing takes an already sorted list and merges into a new on. 
+        new_list = [None] * len(list)
+        # TODO make this
+        return list
+
+    def _swap(list, i, j):
+        a = list[i]
+        list[i] = list[j]
+        list[j] = a     
 
     # behavior
     def _merge_stats(left: List, right: List) -> List[Union[md.Song_Stat, md.Artist_Stat]]:
