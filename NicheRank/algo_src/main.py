@@ -11,6 +11,9 @@ import os
 
 """
 
+def generate_user():
+    pass
+
 def get_history_path()-> str:
     # returns whereever the history is of songs
     example_history_dir = "/home/mattyb/Desktop/summer_class_2024/DSA/Projects/NicheRank/NicheRank/algo_src/example_user_history/"
@@ -19,14 +22,13 @@ def get_history_path()-> str:
     
 def get_global_artiststats() -> Dict[str, md.Artist_Stat]:
     artists_database = "NicheRank/algo_src/playlist_stats/artist_stats_10000.json"
-    return fm.global_playlist_to_music_dict(artists_database)
+    return fm.deserialize_database(artists_database)
 
 def get_global_songstats()->Dict[str, md.Song_Stat]:
     songs_database = "NicheRank/algo_src/playlist_stats/song_stats_10000.json"
-    return fm.global_playlist_to_music_dict(songs_database)
+    return fm.deserialize_database(songs_database)
 
-def main():
-
+def test_user():
     json_history_path:str = get_history_path()
     user_song_hist:List[md.Song] = fm.parse_spotify_history_json(json_history_path)
 
@@ -37,7 +39,10 @@ def main():
     metrics: User_Metrics = user_engine.analyze_history()
     pass
 
+def main():
 
+
+    pass
 
 if __name__ == "__main__":
     main()

@@ -3,7 +3,6 @@ from dataclasses import dataclass
 
 import music_dataclass as md
 from sorting import Local_StatSort, Global_StatSort
-from extraction import Stats_Extractor
 
 """
     THIS IS THE MOST IMPORTANT CLASS!!! Takes your listening history 
@@ -42,8 +41,8 @@ class Mainstream_Engine():
         
         self.sorting = sorting
         self.song_history = history
-        self.user_artist_stats: List[md.Artist_Stat] = Stats_Extractor.extract_artist_stats_from_songs(history)
-        self.user_song_stats: List[md.Song_Stat] = Stats_Extractor.extract_song_stats_from_songs(history)
+        self.user_artist_stats: List[md.Artist_Stat] = md.Stats_Extractor.extract_artist_stats_from_songs(history)
+        self.user_song_stats: List[md.Song_Stat] = md.Stats_Extractor.extract_song_stats_from_songs(history)
 
         self.g_artists_map = global_artists_stat_map
         self.g_song_map = global_song_stat_map
@@ -93,37 +92,37 @@ class Mainstream_Engine():
 
     def calculate_percentile(user_AS:List[md.Artist_Stat], global_AS_map: Dict[str, md.Artist_Stat]):
 
-            """
-                Calculates what percentile of listening popularity a users artists stats are at.
+        """
+            Calculates what percentile of listening popularity a users artists stats are at.
+        
+        """
+
+        sum_pop_artists = 0
+
+        for artist in user_AS:
+            artist_global_weight = global_AS_map[artist.get_uri()].popularity
             
-            """
+            if artist_global_weight == None:
+                # if the artists isnt on the list, they must not be popular
+                artist_global_weight = 0
 
-            sum_pop_artists = 0
+            sum_pop_artists += artist.total_songs * artist_global_weight
 
-            for artist in user_AS:
-                artist_global_weight = global_AS_map[artist.get_uri()].popularity
-                
-                if artist_global_weight == None:
-                    # if the artists isnt on the list, they must not be popular
-                    artist_global_weight = 0
+        avg_artist_pop = sum_pop_artists/len(user_AS)
 
-                sum_pop_artists += artist.total_songs * artist_global_weight
+        # now lets find the percentile of this! 
+        global_AS_list = [artist_stat for uri, artist_stat in global_AS_map.items()]
 
-            avg_artist_pop = sum_pop_artists/len(user_AS)
+        # sorts by most to least popular
+        top_artists: List[md.Artist_Stat] = Local_StatSort.merge_sort(global_AS_list)
 
-            # now lets find the percentile of this! 
-            global_AS_list = [artist_stat for uri, artist_stat in global_AS_map.items()]
+        j = 0
+        for (artist_stat) in reversed(top_artists):
+            j += 1
+            if artist_stat.popularity > avg_artist_pop:
+                # we found where this artists placement is 
+                break
 
-            # sorts by most to least popular
-            top_artists: List[md.Artist_Stat] = Local_StatSort.merge_sort(global_AS_list)
-
-            j = 0
-            for (artist_stat) in reversed(top_artists):
-                j += 1
-                if artist_stat.popularity > avg_artist_pop:
-                    # we found where this artists placement is 
-                    break
-
-            
-            percentile = j/len(top_artists)
-            return percentile
+        
+        percentile = j/len(top_artists)
+        return percentile
