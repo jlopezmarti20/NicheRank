@@ -90,7 +90,6 @@ class Song_Stat:
         else:
             return False        
 
-
 def calculate_artist_popularity(artist_stat:Artist_Stat):
     # simple popularity metric
     a = 0.05
