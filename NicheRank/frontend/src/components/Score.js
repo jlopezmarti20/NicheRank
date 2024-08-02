@@ -37,17 +37,17 @@ export default class Score extends Component {
                 key={index}
                 style={{
                   backgroundColor: "rgba(223,214,239, 0.3)",
-                  padding: "40px",
-                  marginBottom: "40px",
+                  padding: "20px",
+                  marginBottom: "20px",
                   textAlign: "left",
-                  fontSize: "8rem",
+                  fontSize: "2.5rem",
                   color: "white",
                   fontWeight: "bold",
                   whiteSpace: "nowrap",
-                  borderRadius: "20px", // Rounded borders
+                  borderRadius: "5px", // Rounded borders
                   boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                  width: "1300px", // Increased width
-                  height: "200px",
+                  width: "400px", // Increased width
+                  height: "45px",
                 }}
               >
                 {song}
@@ -75,11 +75,11 @@ export default class Score extends Component {
           to="/"
           component={Link}
           style={{
-            fontSize: "5rem", // Adjust the font size as needed
+            fontSize: "1.5rem", // Adjust the font size as needed
             padding: "12px 24px", // Adjust the padding for button size
             position: "absolute",
-            top: "20px",
-            left: "20px",
+            top: "10px",
+            left: "10px",
           }}
         >
           Back
@@ -101,15 +101,15 @@ export default class Score extends Component {
               align="center"
               style={{
                 position: "absolute",
-                top: 300,
-                left: -1500,
+                top: 120,
+                left: -500,
                 whiteSpace: "nowrap",
                 color: "white",
                 fontFamily: "'Roboto', sans-serif",
                 fontWeight: "bold",
-                borderBottom: "20px solid white",
-                paddingBottom: "20px",
-                fontSize: "8rem",
+                borderBottom: "10px solid white",
+                paddingBottom: "10px",
+                fontSize: "2.5rem",
               }}
             >
               Your top song playlist
@@ -126,12 +126,12 @@ export default class Score extends Component {
                 borderRadius: "10px",
                 boxShadow: "10px 10px 10px rgba(0, 0, 0, 0.1)",
                 position: "absolute",
-                top: 290,
-                left: -100,
+                top: 100,
+                left: -50,
                 color: "white",
                 fontFamily: "'Roboto', sans-serif",
                 fontWeight: "bold",
-                fontSize: "8rem",
+                fontSize: "2.5rem",
               }}
             >
               Obscurity Score: {obscurityScore}%
@@ -148,8 +148,8 @@ export default class Score extends Component {
               alignItems: "center",
               marginTop: "400px",
               position: "absolute",
-              top: 200,
-              left: -100,
+              top: -175,
+              left: -50,
             }}
           >
             {columns}
