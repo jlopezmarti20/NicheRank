@@ -37,8 +37,10 @@ function App() {
                   component="h4"
                   variant="h4"
                   style={{
-                    fontSize: "7rem", // Increase font size for home page
+                    fontSize: "2.5rem", // Increase font size for home page
                     fontWeight: "bold",
+                    position: "relative",
+                    top: -100,
                     color: "#fff",
                   }}
                 >
@@ -47,11 +49,13 @@ function App() {
               </Grid>
               <Grid item xs={12} align="center">
                 <Typography
-                  component="h5"
-                  variant="h5"
+                  component="h6"
+                  variant="h6"
                   style={{
-                    fontSize: "6rem", // Increase font size for home page
+                    fontSize: "2rem", // Increase font size for home page
                     color: "#fff",
+                    position: "relative",
+                    top: -90,
                   }}
                 >
                   Learn more about your music taste and compare it to others
@@ -63,11 +67,11 @@ function App() {
                   color="secondary"
                   variant="contained"
                   style={{
-                    minWidth: "500px",
-                    height: "500px",
+                    minWidth: "200px",
+                    height: "200px",
                     borderRadius: "50%",
                     padding: "10px",
-                    fontSize: "5rem",
+                    fontSize: "2rem",
                   }}
                   to="/Score"
                   component={Link}
