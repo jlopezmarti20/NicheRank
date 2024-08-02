@@ -2,7 +2,7 @@ from typing import Dict, List
 from dataclasses import dataclass
 
 import music_dataclass as md
-from sorting import Local_Sort, Global_Sort
+from sorting import Local_StatSort, Global_StatSort
 from extraction import Stats_Extractor
 
 """
@@ -58,16 +58,16 @@ class Mainstream_Engine():
     
     def calculate_artist_metrics(self) -> Artist_Metrics:
         # Artist Metrics
-        favorite_artists: List[md.Artist_Stat] = Local_Sort.merge_sort(self.user_artist_stats)
-        popular_artists: List[md.Artist_Stat] = Global_Sort.merge_sort(self.user_artist_stats, self.g_artists_map)
+        favorite_artists: List[md.Artist_Stat] = Local_StatSort.merge_sort(self.user_artist_stats)
+        popular_artists: List[md.Artist_Stat] = Global_StatSort.merge_sort(self.user_artist_stats, self.g_artists_map)
         artist_metrics = Artist_Metrics(favorites=favorite_artists,most_popular=popular_artists,num_listened=len(favorite_artists) )
         return artist_metrics
     
     def calculate_song_metrics(self) -> Song_Metrics:
 
         # get song metrics
-        favorite_songs: List[md.Song_Stat] = Local_Sort.merge_sort(self.user_song_stats)
-        popular_songs: List[md.Song_Stat] = Global_Sort.merge_sort(self.user_song_stats, self.g_song_map)  
+        favorite_songs: List[md.Song_Stat] = Local_StatSort.merge_sort(self.user_song_stats)
+        popular_songs: List[md.Song_Stat] = Global_StatSort.merge_sort(self.user_song_stats, self.g_song_map)  
         song_met = Song_Metrics(favorites=favorite_songs, most_popular=popular_songs, num_listened=len(favorite_songs))
         
         return song_met
@@ -102,7 +102,7 @@ class Mainstream_Engine():
             global_AS_list = [artist_stat for uri, artist_stat in global_AS_map.items()]
 
             # sorts by most to least popular
-            top_artists: List[md.Artist_Stat] = Local_Sort.merge_sort(global_AS_list)
+            top_artists: List[md.Artist_Stat] = Local_StatSort.merge_sort(global_AS_list)
 
             j = 0
             for (artist_stat) in reversed(top_artists):

@@ -1,19 +1,23 @@
 from typing import List, Tuple, Dict, Union, Any
 import music_dataclass as md
+from extraction import Stats_Extractor
+
 """
     Sorting Class for taking either Songs or Song Stats and sorting them by a given metric
 
 """
 
 
-class Local_Sort():
+class Local_StatSort():
     
     """
         Stat sort sorts descending by which Stats most listened to   
     """
 
+
     def merge_sort(stats_list:List[Union[md.Song_Stat, md.Artist_Stat]]):
-        return Local_Sort._merge_sort_stats(stats_list)
+        # remember must be stats!!
+        return Local_StatSort._merge_sort_stats(stats_list)
     
     def quick_sort(stats_list:List[Union[md.Song_Stat, md.Artist_Stat]]):
         """
@@ -21,20 +25,20 @@ class Local_Sort():
             over again. However, to avoid deletions and array creation, we will need to fuse all repeats as the
             very last process in O(N) time.
         """
-        sorted_list = Local_Sort._quicksort_stats(stats_list, 0, len(stats_list) - 1) #? O(NLog(N))
+        sorted_list = Local_StatSort._quicksort_stats(stats_list, 0, len(stats_list) - 1) #? O(NLog(N))
         # now that we have sorted this list, there may be repeats, so we must merge this in O(N).
         # TODO fuse together repeats in list. The list should be sorted, so this step should be simple.
-        new_list = Local_Sort._fuse(sorted_list)
+        new_list = Local_StatSort._fuse(sorted_list)
         return new_list
 
     def _quicksort_stats(stats_list: List[Union[md.Artist_Stat, md.Song_Stat]], l, r)-> None:
         if (l == r):
             pass
 
-        piv = Local_Sort._pivot(stats_list, l, r)
+        piv = Local_StatSort._pivot(stats_list, l, r)
 
-        Local_Sort._quicksort_stats(stats_list, l, piv - 1)
-        Local_Sort._quicksort_stats(stats_list, piv + 1, r)
+        Local_StatSort._quicksort_stats(stats_list, l, piv - 1)
+        Local_StatSort._quicksort_stats(stats_list, piv + 1, r)
 
     def _pivot(stats_list: List[Union[md.Artist_Stat, md.Song_Stat]], l, r) -> int:
         piv = r
@@ -44,18 +48,18 @@ class Local_Sort():
 
         while (i < j):
 
-            while ( i < r and Local_Sort._compare_obj(stats_list[i], stats_list[piv]) == -1):
+            while ( i < r and Local_StatSort._compare_obj(stats_list[i], stats_list[piv]) == -1):
                 # keep moving i right while i greater then piv
                 i += 1
 
-            while (j >= l and Local_Sort._compare_obj(stats_list[j], stats_list[piv]) == 1):
+            while (j >= l and Local_StatSort._compare_obj(stats_list[j], stats_list[piv]) == 1):
                 # keep going left while j is smaller then piv
                 j -= 1
 
-            Local_Sort._swap(stats_list, i, j)
+            Local_StatSort._swap(stats_list, i, j)
 
         # swap i and pivot?
-        Local_Sort._swap(stats_list, i)
+        Local_StatSort._swap(stats_list, i)
 
     def _fuse(list):
         # fusing takes an already sorted list and merges into a new on. 
@@ -80,7 +84,7 @@ class Local_Sort():
             sorted = []
 
             while(l < len(left)) and (r < len(right)):
-                comparison = Local_Sort._compare_obj(left[l], right[r])
+                comparison = Local_StatSort._compare_obj(left[l], right[r])
                 if comparison == 0:
                     # combine 2 and add to both 
                     # THESE SHOULD REALLY BE CLASSES not dataclasses lololol FUCKKK
@@ -122,7 +126,7 @@ class Local_Sort():
         sorted = [None] * size
 
         while(l < len(left)) and (r < len(right)):
-            comparison = Local_Sort._compare_obj(left[l], right[r])
+            comparison = Local_StatSort._compare_obj(left[l], right[r])
             if comparison == 0:
                 # combine 2 and add to both 
                 # THESE SHOULD REALLY BE CLASSES not dataclasses lololol FUCKKK
@@ -163,10 +167,10 @@ class Local_Sort():
         mid = len(stats_list) // 2
         left_songs = stats_list[:mid]
         right_songs = stats_list[mid:]
-        sorted_left = Local_Sort._merge_sort_stats(left_songs)
-        sorted_right = Local_Sort._merge_sort_stats(right_songs)
+        sorted_left = Local_StatSort._merge_sort_stats(left_songs)
+        sorted_right = Local_StatSort._merge_sort_stats(right_songs)
 
-        return Local_Sort._fast_merge_stats(sorted_left, sorted_right) 
+        return Local_StatSort._fast_merge_stats(sorted_left, sorted_right) 
 
     def _compare_obj(l, r):
         # compares 2 artist_stats or song_stats
@@ -193,14 +197,14 @@ class Local_Sort():
                 return 1
 
 
-class Global_Sort():
+class Global_StatSort():
 
     """
         Popularity sort sorts decending by seeing which Stats more popular in Global Taste
     """
 
     def merge_sort(stats_list:List[Union[md.Artist_Stat, md.Song_Stat]], music_map) -> List[Union[md.Artist_Stat, md.Song_Stat]]:
-        return Global_Sort._merge_sort_stats(stats_list, music_map)
+        return Global_StatSort._merge_sort_stats(stats_list, music_map)
 
     def _merge_sort_stats(stats_list:List[Union[md.Artist_Stat, md.Song_Stat]], music_map):
         
@@ -210,10 +214,10 @@ class Global_Sort():
         mid = len(stats_list) // 2
         left_songs = stats_list[:mid]
         right_songs = stats_list[mid:]
-        sorted_left = Global_Sort._merge_sort_stats(left_songs, music_map)
-        sorted_right = Global_Sort._merge_sort_stats(right_songs, music_map)
+        sorted_left = Global_StatSort._merge_sort_stats(left_songs, music_map)
+        sorted_right = Global_StatSort._merge_sort_stats(right_songs, music_map)
 
-        return Global_Sort._merge_stats(sorted_left, sorted_right, music_map) 
+        return Global_StatSort._merge_stats(sorted_left, sorted_right, music_map) 
         
     def _merge_stats(left: List, right: List, music_map) -> List[Union[md.Song_Stat, md.Artist_Stat]]:
             
@@ -223,7 +227,7 @@ class Global_Sort():
 
             while(l < len(left)) and (r < len(right)):
                 
-                comparison = Global_Sort.global_compare(l, r, music_map)
+                comparison = Global_StatSort.global_compare(l, r, music_map)
                 if comparison == 0:
                     # combine 2 and add to both 
                     # THESE SHOULD REALLY BE CLASSES not dataclasses lololol FUCKKK
@@ -264,7 +268,7 @@ class Global_Sort():
         sorted = [None] * size
 
         while(l < len(left)) and (r < len(right)):
-            comparison = Popularity_Sort.global_compare(left[l], right[r], music_map)
+            comparison = Global_StatSort.global_compare(left[l], right[r], music_map)
             if comparison == 0:
                 # combine 2 and add to both 
                 # THESE SHOULD REALLY BE CLASSES not dataclasses lololol FUCKKK
