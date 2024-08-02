@@ -9,10 +9,21 @@ import music_dataclass as md
 
 class Sorter():
 
-    def quicksort(list):
-        return Sorter._quicksort(list, 0, len(list))
+    def merge_sort(list: List[Tuple[str, float]]):
+        if len(list) == 1:
+            return list
+        mid = len(list) // 2 
+        left = list[:mid]
+        right = list[mid:]
+        sorted_left = Sorter.merge_sort(left)
+        sorted_right = Sorter.merge_sort(right)
 
-    def _quicksort(list: List[(str, float)], l, r)-> None:
+        return Sorter.merge_fast(sorted_left, sorted_right) 
+
+    def quicksort(list: List[Tuple[str, float]]) -> List[Tuple[str, float]]:
+        return Sorter._quicksort(list, 0, len(list) - 1)
+
+    def _quicksort(list: List[Tuple[str, float]], l, r)-> None:
         if (l >= r):
             return
 
@@ -48,17 +59,6 @@ class Sorter():
         a = list[i]
         list[i] = list[j]
         list[j] = a     
-
-    def merge_sort(list: List[Tuple[str, float]]):
-        if len(list) == 1:
-            return list
-        mid = len(list) // 2 
-        left = list[:mid]
-        right = list[mid:]
-        sorted_left = Sorter.merge_sort(left)
-        sorted_right = Sorter.merge_sort(right)
-
-        return Sorter.merge_fast(sorted_left, sorted_right)
     
     def merge_fast(left: List[Tuple[str, float]], right: List[Tuple[str, float]]):
 
@@ -179,9 +179,8 @@ class StatSorter(Sorter):
     @staticmethod
     def merge_sort_stats(stats_list: List[Union[md.Song_Stat, md.Artist_Stat]]) -> List[Union[md.Song_Stat, md.Artist_Stat]]:
         stats_as_tuple = [(stat.get_uri(), stat.popularity) for stat in stats_list]
-        stats_map = {stat.get_uri(): stat for stat in stats_list}
         sorted_tuple = Sorter.merge_sort(stats_as_tuple)
-        music_list = StatSorter.recreate_music_list(sorted_tuple, stats_map)
+        music_list = StatSorter.recreate_music_list(sorted_tuple, stats_list)
         return music_list
     @staticmethod
     def quicksort_stats(stats_list:List[Union[md.Song_Stat, md.Artist_Stat]]):
@@ -191,29 +190,39 @@ class StatSorter(Sorter):
             very last process in O(N) time.
         """
         stats_as_tuple = [(stat.get_uri(), stat.popularity) for stat in stats_list]
-        stats_map = {stat.get_uri() for stat in stats_list}
-        Sorter.quicksort(stats_as_tuple, 0, len(stats_list) - 1) #? O(NLog(N))
-        music_list = StatSorter.recreate_music_list(stats_as_tuple, stats_map)
+        
+        Sorter.quicksort(stats_as_tuple) #? O(NLog(N))
+        music_list = StatSorter.recreate_music_list(stats_as_tuple, stats_list)
         return music_list
 
     @staticmethod    
-    def recreate_music_list(sorted_list, uri_map: Dict[str, Union[md.Song_Stat, md.Artist_Stat]])-> List[Union[md.Song_Stat, md.Artist_Stat]]:
-        new_list = [None] * len(sorted_list)
+    def recreate_music_list(sorted_list, stats_list: List[Union[md.Song_Stat, md.Artist_Stat]])-> List[Union[md.Song_Stat, md.Artist_Stat]]:
+        uri_map = {stat.get_uri(): stat for stat in stats_list}
+        new_list = [(None, None)] * len(sorted_list)
         for i in range(len(sorted_list)):
             cur_uri = sorted_list[i][0]
             new_list[i] = uri_map[cur_uri]
 
         return new_list
 
-class Global_Sorter(Sorter):
+class GlobalSorter(Sorter):
 
     @staticmethod
     def merge_sort_stats(stats_list: List[Union[md.Song_Stat, md.Artist_Stat]], global_music_dict) -> List[Union[md.Song_Stat, md.Artist_Stat]]:
-        stats_as_tuple = [(stat.get_uri(), global_music_dict[stat.get_uri].popularity) for stat in stats_list]
-        stats_map = {stat.get_uri(): stat for stat in stats_list}
+
+        stats_as_tuple = []
+        for stat in stats_list:
+            uri = stat.get_uri()
+            if uri in global_music_dict:
+                popularity = global_music_dict[uri].popularity
+            else:
+                popularity = 0
+            stats_as_tuple.append((uri, popularity))
+
         sorted_tuple = Sorter.merge_sort(stats_as_tuple)
-        music_list = StatSorter.recreate_music_list(sorted_tuple, stats_map)
+        music_list = GlobalSorter.recreate_music_list(sorted_tuple, stats_list)
         return music_list
+    
     @staticmethod
     def quicksort_stats(stats_list:List[Union[md.Song_Stat, md.Artist_Stat]], global_music_dict):
         """
@@ -221,18 +230,32 @@ class Global_Sorter(Sorter):
             over again. However, to avoid deletions and array creation, we will need to fuse all repeats as the
             very last process in O(N) time.
         """
-        stats_as_tuple = [(stat.get_uri(), global_music_dict[stat.get_uri].popularity) for stat in stats_list]
-        stats_map = {stat.get_uri() for stat in stats_list}
-        Sorter.quicksort(stats_as_tuple, 0, len(stats_list) - 1) #? O(NLog(N))
-        music_list = StatSorter.recreate_music_list(stats_as_tuple, stats_map)
+        stats_as_tuple = []
+        for stat in stats_list:
+            uri = stat.get_uri()
+            if uri in global_music_dict:
+                popularity = global_music_dict[uri].popularity
+            else:
+                popularity = 0
+            stats_as_tuple.append((uri, popularity))
+        
+        Sorter.quicksort(stats_as_tuple) #? O(NLog(N))
+        music_list = GlobalSorter.recreate_music_list(stats_as_tuple, stats_list)
         return music_list
 
     @staticmethod    
-    def recreate_music_list(sorted_list, uri_map: Dict[str, Union[md.Song_Stat, md.Artist_Stat]])-> List[Union[md.Song_Stat, md.Artist_Stat]]:
+    def recreate_music_list(sorted_list, stats_list)-> List[Union[md.Song_Stat, md.Artist_Stat]]:
+        stats_map = {stat.get_uri(): stat for stat in stats_list}
+
         new_list = [None] * len(sorted_list)
         for i in range(len(sorted_list)):
             cur_uri = sorted_list[i][0]
-            new_list[i] = uri_map[cur_uri]
+            new_list[i] = stats_map[cur_uri]
+        
+        return new_list
+
+
+""" BADDD lets delete this pleaseee"""
 
 class Local_StatSort():
     
