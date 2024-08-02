@@ -5,6 +5,7 @@ from dataclasses import asdict
 from tqdm import tqdm
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import music_dataclass as md
@@ -15,24 +16,25 @@ import music_dataclass as md
 
 """
 
-def global_playlist_to_music_dict(stats_json_path) -> Dict[str, Union[md.Artist_Stat, md.Song_Stat]]:
-    # returns a already extracted playlist and returns a dict of each uri and its associated stats
-
+def deserialize_database(stats_json_path) -> Dict[Dict[str, md.Artist_Stat], Dict[str, md.Song_Stat]]:
+    # Database_json -> Database Dict with artist_stats: and song_stats:
     with open(stats_json_path, 'r') as f:
         json_data = json.load(f)
+    artists = json_data["artist_stats"]
+    songs = json_data["song_stats"]
 
-    return {uri : convert_dict_to_music(music_dict) for uri, music_dict in json_data.items()}
-
+    return ({uri: md.convert_dict_to_music(music_dict) for uri, music_dict in artists.items()},
+            {uri: md.convert_dict_to_music(music_dict) for uri, music_dict in songs.items()})
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, (md.Artist_Stat, md.Song_Stat, md.Artist, md.Song)):
-            return convert_music_to_dict(obj)
+            return md.convert_music_to_dict(obj)
         return super().default(obj)
 
 def parse_spotify_history_json(response_path:str)->List[md.Song]:
     """
-        parse playlist spotify into a list of dictionaries of song stats 
+        parse playlist spotify into a list  of song stats 
         see https://developer.spotify.com/documentation/web-api/reference/get-recently-played for more on responses
         return: List[md.Song]
     """
@@ -140,12 +142,23 @@ class Dataset_Extractor():
         if (not os.path.exists(self.database_path)):
             raise IOError(f'File doesnt exist: {self.database_path}')
         
-    def load_stats(self, load_percent=0.5, save=True):
+    def create_database(self, load_percent=0.5, save=True):
 
         # loads both artist and music stats together
         artist_database: Dict[str, md.Artist_Stat] = self.extract_dataset_artist_stats(load_percent=load_percent)
         song_database: Dict[str, md.Song_Stat] = self.extract_dataset_song_stats(load_percent=load_percent)
 
+        num_playlists = int(load_percent * 1_000_000)
+        database = {
+                    "artist_stats": artist_database, 
+                    "song_stats": song_database
+                    }
+        # now save these as a database class
+        save_name = f"database_{num_playlists}.json"
+        save_path = os.path.join(self.save_location, save_name)
+
+        with open(save_path, "w") as f:
+            json.dump(database, f, cls=CustomJSONEncoder, indent=2)
 
 
     def extract_dataset_artist_stats(self, load_percent=0.5,json_parse="fast") -> Dict[str, md.Artist_Stat]:
@@ -170,7 +183,7 @@ class Dataset_Extractor():
             # current slice has playlists 
             cur_slice = slices[i]
             cur_slice_path = os.path.join(data_dir, cur_slice)
-            playlists: List[Tuple[int, List[md.Song]]] = load_slice(cur_slice_path, json_parse)
+            playlists: List[Tuple[int, List[md.Song]]] = Dataset_Loader.load_slice(cur_slice_path, json_parse)
             
             for j, (followers, playlist) in enumerate(playlists):
                 if i == endslice and j == num_playlists % 1000:
@@ -200,7 +213,7 @@ class Dataset_Extractor():
         for i in slice_range:
             cur_slice = slices[i]
             cur_slice_path = os.path.join(data_dir, cur_slice)
-            playlists: List[Tuple[int, List[md.Song]]] = load_slice(cur_slice_path, json_parse)
+            playlists: List[Tuple[int, List[md.Song]]] = Dataset_Loader.load_slice(cur_slice_path, json_parse)
 
             for j, (followers, playlist) in enumerate(playlists):
                 if i == endslice and j == num_playlists % 1000:
@@ -209,17 +222,3 @@ class Dataset_Extractor():
                 md.Stats_Extractor.extract_songstats(playlist, songs_dict, followers=followers)
                     
         return songs_dict
-    
-    def save_song_stats(self, songs_dict, num_playlists):
-        save_name = f"song_stats_{num_playlists}.json"
-        save_path = os.path.join(self.save_location, save_name)
-        with open(save_path, "w") as f:
-            json.dump(songs_dict, f, cls=CustomJSONEncoder, indent=2)
-
-    def save_artist_stats(self, artists_dict, num_playlists):
-        save_name = f"artist_stats_{num_playlists}.json"
-        
-        save_path = os.path.join(self.save_location, save_name)
-        with open(save_path, "w") as f:
-            json.dump(artists_dict, f, cls=CustomJSONEncoder, indent=2)
-
