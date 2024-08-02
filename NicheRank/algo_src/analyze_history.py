@@ -34,44 +34,6 @@ class User_Metrics:
     time_listened_s: float
 
 
-def calculate_percentile(user_AS:List[md.Artist_Stat], global_AS_map: Dict[str, md.Artist_Stat]):
-
-        """
-            Calculates what percentile of listening popularity a users artists stats are at.
-        
-        """
-
-        sum_pop_artists = 0
-
-        for artist in user_AS:
-            artist_global_weight = global_AS_map[artist.get_uri()].popularity
-            
-            if artist_global_weight == None:
-                # if the artists isnt on the list, they must not be popular
-                artist_global_weight = 0
-
-            sum_pop_artists += artist.total_songs * artist_global_weight
-
-        avg_artist_pop = sum_pop_artists/len(user_AS)
-
-        # now lets find the percentile of this! 
-        global_AS_list = [artist_stat for uri, artist_stat in global_AS_map.items()]
-
-        # sorts by most to least popular
-        top_artists: List[md.Artist_Stat] = Local_Sort.merge_sort(global_AS_list)
-
-        j = 0
-        for (artist_stat) in reversed(top_artists):
-            j += 1
-            if artist_stat.popularity > avg_artist_pop:
-                # we found where this artists placement is 
-                break
-
-        
-        percentile = j/len(top_artists)
-        return percentile
-
-
 # Behavior Class
 class Mainstream_Engine():
 
@@ -113,13 +75,42 @@ class Mainstream_Engine():
     def calculate_mainstream_score(self):
 
         # use calculate_percentile
-        return calculate_percentile(self.user_artist_stats, self.g_artists_map)
+        return Mainstream_Engine.calculate_percentile(self.user_artist_stats, self.g_artists_map)
 
-    def grouping_based_allignment():
 
-        """
-            Sections into n groups that represent "popularity tiers" and then
-            gives popularity score based off that tier
-        """
+    def calculate_percentile(user_AS:List[md.Artist_Stat], global_AS_map: Dict[str, md.Artist_Stat]):
 
-        pass
+            """
+                Calculates what percentile of listening popularity a users artists stats are at.
+            
+            """
+
+            sum_pop_artists = 0
+
+            for artist in user_AS:
+                artist_global_weight = global_AS_map[artist.get_uri()].popularity
+                
+                if artist_global_weight == None:
+                    # if the artists isnt on the list, they must not be popular
+                    artist_global_weight = 0
+
+                sum_pop_artists += artist.total_songs * artist_global_weight
+
+            avg_artist_pop = sum_pop_artists/len(user_AS)
+
+            # now lets find the percentile of this! 
+            global_AS_list = [artist_stat for uri, artist_stat in global_AS_map.items()]
+
+            # sorts by most to least popular
+            top_artists: List[md.Artist_Stat] = Local_Sort.merge_sort(global_AS_list)
+
+            j = 0
+            for (artist_stat) in reversed(top_artists):
+                j += 1
+                if artist_stat.popularity > avg_artist_pop:
+                    # we found where this artists placement is 
+                    break
+
+            
+            percentile = j/len(top_artists)
+            return percentile
