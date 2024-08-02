@@ -11,7 +11,7 @@ If you would like to extract a dataset yourself, use the playlist_parse.py scrip
 Jesus Lopez 
 Role: Frontend Developer
 
-Amanda Panda
+Amanda Brannon
 Role: Data retrieval and Backend Developer
 
 Matthew Boughton
