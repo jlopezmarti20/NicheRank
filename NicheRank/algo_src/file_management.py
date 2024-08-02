@@ -8,7 +8,6 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import music_dataclass as md
-from extraction import Stats_Extractor
 
 """
     Methods for parsing json into objects for python class use.
@@ -24,68 +23,6 @@ def global_playlist_to_music_dict(stats_json_path) -> Dict[str, Union[md.Artist_
 
     return {uri : convert_dict_to_music(music_dict) for uri, music_dict in json_data.items()}
 
-
-def convert_dict_to_music(json_dict):
-    # dict is a dictionary representing a dataclass object
-    if "artists" in json_dict:
-        # this is a song 
-        song = md.Song(name=json_dict["name"],
-                       uri=json_dict["uri"],
-                       duration_s=json_dict["duration_s"])
-        for artist in json_dict["artists"]:
-            song.artists.append(convert_dict_to_music(artist))
-        return song
-
-    elif "artist" in json_dict:
-        # this is an artist_stat
-        return md.Artist_Stat(artist=convert_dict_to_music(json_dict["artist"]),
-                              total_s=json_dict["total_s"],
-                              total_songs=json_dict["total_songs"] ,
-                              total_playlists=json_dict["total_playlists"],
-                              weighted_listens=json_dict["weighted_listens"])
-    
-    elif "song" in json_dict:
-        # this is a song_stat
-        return md.Song_Stat(song=convert_dict_to_music(json_dict["song"]),
-                            total_listens=json_dict["total_listens"],
-                            weighted_listens=json_dict["weighted_listens"])
-    
-    elif len(json_dict) == 2:
-        # this is a artist 
-        return md.Artist(name=json_dict["name"], uri=json_dict["uri"])
-
-# for json encoding
-def convert_music_to_dict(music)-> dict:
-    if isinstance(music, md.Song_Stat):
-        return {
-            'song': convert_music_to_dict(music.song),
-            'total_listens': music.total_listens,
-            'weighted_listens': music.weighted_listens
-        }
-    
-    elif isinstance(music, md.Artist_Stat):
-
-        return {
-            'artist':convert_music_to_dict(music.artist),
-            'total_s': music.total_s,
-            'total_songs': music.total_songs,
-            'total_playlists': music.total_playlists,
-            'weighted_listens': music.weighted_listens
-        }
-        
-    elif isinstance(music, md.Song):
-        return {
-            'name': music.name,
-            'uri': music.uri,
-            'artists': [convert_music_to_dict(artist) for artist in music.artists],
-            'duration_s': music.duration_s
-        }
-
-    elif isinstance(music, md.Artist):
-        return asdict(music)
-    
-    else:
-        return None
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -118,66 +55,71 @@ def parse_spotify_history_json(response_path:str)->List[md.Song]:
 
     return recently_played
 
-def load_slice(slice_path, version="fast")->List[ Tuple[int, List[md.Song]]]:
-    # loads into a list of playlists, each holding num_followers and songs in that playlist
-    if version == "fast":
-        return faster_load_slice(slice_path)
-    
-    elif version == "slow":
-        return slow_load_slice(slice_path)
-    
-    else:
-        return faster_load_slice(slice_path)
+class Dataset_Loader:
+    """
+        Class for loading slices from Million Spotify Database
+    """
 
-def slow_load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
-    
-    # loads into a list of playlists, each holding num_followers and songs in that playlist
+    def load_slice(slice_path, version="fast")->List[ Tuple[int, List[md.Song]]]:
+        # loads into a list of playlists, each holding num_followers and songs in that playlist
+        if version == "fast":
+            return Dataset_Loader.faster_load_slice(slice_path)
+        
+        elif version == "slow":
+            return Dataset_Loader.slow_load_slice(slice_path)
+        
+        else:
+            return Dataset_Loader.faster_load_slice(slice_path)
 
-    with open(slice_path, 'r') as f:
-        slice_json = json.load(f)
+    def slow_load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
+        
+        # loads into a list of playlists, each holding num_followers and songs in that playlist
 
-    parsed_slice:list[(int, list[md.Song])] = []
+        with open(slice_path, 'r') as f:
+            slice_json = json.load(f)
 
-    for playlist in slice_json["playlists"]:
-        followers = playlist["num_followers"]
-        parsed_playlist = []
-        for track in playlist["tracks"]:
-            song = md.Song(name=track["track_name"], 
-                           uri=track["track_uri"],
-                           artists=[md.Artist(name=track["artist_name"], uri=track["artist_uri"])],
-                           duration_s=track["duration_ms"]/1000
-                           )
-            parsed_playlist.append(song)
+        parsed_slice:list[(int, list[md.Song])] = []
 
-        parsed_slice.append((followers, parsed_playlist))
+        for playlist in slice_json["playlists"]:
+            followers = playlist["num_followers"]
+            parsed_playlist = []
+            for track in playlist["tracks"]:
+                song = md.Song(name=track["track_name"], 
+                            uri=track["track_uri"],
+                            artists=[md.Artist(name=track["artist_name"], uri=track["artist_uri"])],
+                            duration_s=track["duration_ms"]/1000
+                            )
+                parsed_playlist.append(song)
 
-    return parsed_slice
+            parsed_slice.append((followers, parsed_playlist))
+
+        return parsed_slice
 
 
-def faster_load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
+    def faster_load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
 
-    # use a list comprehension instead
+        # use a list comprehension instead
 
-    with open(slice_path, 'r') as f:
-        slice_json = json.load(f)
-    # Parse playlists into the desired format
-    parsed_slice = [
-        (
-            playlist["num_followers"],
-            [
-                md.Song(
-                    name=track["track_name"],
-                    uri=track["track_uri"],
-                    artists=[md.Artist(name=track["artist_name"], uri=track["artist_uri"])],
-                    duration_s=track["duration_ms"] / 1000  # Corrected conversion to seconds
-                )
-                for track in playlist["tracks"]
-            ]
-        )
-        for playlist in slice_json["playlists"]
-    ]
+        with open(slice_path, 'r') as f:
+            slice_json = json.load(f)
+        # Parse playlists into the desired format
+        parsed_slice = [
+            (
+                playlist["num_followers"],
+                [
+                    md.Song(
+                        name=track["track_name"],
+                        uri=track["track_uri"],
+                        artists=[md.Artist(name=track["artist_name"], uri=track["artist_uri"])],
+                        duration_s=track["duration_ms"] / 1000  # Corrected conversion to seconds
+                    )
+                    for track in playlist["tracks"]
+                ]
+            )
+            for playlist in slice_json["playlists"]
+        ]
 
-    return parsed_slice
+        return parsed_slice
 
 # behavior class
 class Dataset_Extractor():
@@ -198,7 +140,15 @@ class Dataset_Extractor():
         if (not os.path.exists(self.database_path)):
             raise IOError(f'File doesnt exist: {self.database_path}')
         
-    def load_artist_stats(self, load_percent=0.5,json_parse="fast", save=False) -> Dict[str, md.Artist_Stat]:
+    def load_stats(self, load_percent=0.5, save=True):
+
+        # loads both artist and music stats together
+        artist_database: Dict[str, md.Artist_Stat] = self.extract_dataset_artist_stats(load_percent=load_percent)
+        song_database: Dict[str, md.Song_Stat] = self.extract_dataset_song_stats(load_percent=load_percent)
+
+
+
+    def extract_dataset_artist_stats(self, load_percent=0.5,json_parse="fast") -> Dict[str, md.Artist_Stat]:
         """
             creates a list of artist stats (unordered) 
         """
@@ -226,13 +176,10 @@ class Dataset_Extractor():
                 if i == endslice and j == num_playlists % 1000:
                     # for processing final slice
                     break
-                Stats_Extractor.extract_artiststats(playlist, artist_dict, followers=followers)
-
-        if save:
-            self.save_artist_stats(artist_dict, num_playlists)
+                md.Stats_Extractor.extract_artiststats(playlist, artist_dict, followers=followers)
         return artist_dict        
         
-    def load_song_stats(self, load_percent=0.5, json_parse="fast", save=False) -> Dict[str, md.Song_Stat]:
+    def extract_dataset_song_stats(self, load_percent=0.5, json_parse="fast") -> Dict[str, md.Song_Stat]:
         """
             Creates a list of song_stats (unordered)
         
@@ -259,10 +206,8 @@ class Dataset_Extractor():
                 if i == endslice and j == num_playlists % 1000:
                     break
 
-                Stats_Extractor.extract_songstats(playlist, songs_dict, followers=followers)
+                md.Stats_Extractor.extract_songstats(playlist, songs_dict, followers=followers)
                     
-        if save:
-            self.save_song_stats(songs_dict, num_playlists)
         return songs_dict
     
     def save_song_stats(self, songs_dict, num_playlists):
