@@ -20,11 +20,11 @@ def deserialize_database(stats_json_path) -> Dict[Dict[str, md.Artist_Stat], Dic
     # Database_json -> Database Dict with artist_stats: and song_stats:
     with open(stats_json_path, 'r') as f:
         json_data = json.load(f)
-    artists = json_data["artist_stats"]
-    songs = json_data["song_stats"]
 
-    return ({uri: md.convert_dict_to_music(music_dict) for uri, music_dict in artists.items()},
-            {uri: md.convert_dict_to_music(music_dict) for uri, music_dict in songs.items()})
+    artists_dict = {uri: md.convert_dict_to_music(artist) for uri, artist in json_data["artist_stats"].items()}
+    songs_dict = {uri: md.convert_dict_to_music(song_stat) for uri, song_stat in json_data["song_stats"].items()}
+    return {"artist_stats": artists_dict,
+            "song_stats": songs_dict}
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -136,7 +136,7 @@ class Dataset_Extractor():
         """
         self.database_path = database_path 
         self.profile = profile
-        self.save_location = "NicheRank/algo_src/playlist_stats"
+        self.save_location = "NicheRank/algo_src/database"
 
         # check if database path exists
         if (not os.path.exists(self.database_path)):
