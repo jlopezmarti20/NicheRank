@@ -44,7 +44,7 @@ function App() {
                     color: "#fff",
                   }}
                 >
-                  Welcome to your Niche Ranking Music
+                  Welcome to your Niche Ranking Music!
                 </Typography>
               </Grid>
               <Grid item xs={12} align="center">
