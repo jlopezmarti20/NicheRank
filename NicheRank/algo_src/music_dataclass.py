@@ -1,7 +1,6 @@
 from dataclasses import dataclass, asdict, field
 from typing import List, Dict
 
-
 # data class
 @dataclass
 class Artist:

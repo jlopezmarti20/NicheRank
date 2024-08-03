@@ -17,8 +17,6 @@ import music_dataclass as md
 """
 
 
-
-
 def deserialize_database(stats_json_path) -> Dict[Dict[str, md.Artist_Stat], Dict[str, md.Song_Stat]]:
     # Database_json -> Database Dict with artist_stats: and song_stats:
     with open(stats_json_path, 'r') as f:
@@ -35,16 +33,22 @@ class CustomJSONEncoder(json.JSONEncoder):
             return md.convert_music_to_dict(obj)
         return super().default(obj)
 
-def parse_spotify_history_json(response_path:str)->List[md.Song]:
+def parse_spotify_history_json(response)->List[md.Song]:
     """
         parse playlist spotify into a list  of song stats 
         see https://developer.spotify.com/documentation/web-api/reference/get-recently-played for more on responses
         return: List[md.Song]
     """
-
-    with open(response_path, "r") as f:
-        response_json = json.load(f)
-
+    if isinstance(response, str):
+        # response is a file location  
+        with open(response, "r") as f:
+            response_json = json.load(f)
+    elif isinstance(response, dict):
+        response_json = response
+    else:
+        print("WRONG RESPONSE TYPE GIVEN")
+        return None
+        
     recently_played: List[md.Song] = [] # list of song dataclasses
     for play_history in response_json["items"]:
         # organizes json object into more easily parsable list of song dataclasses

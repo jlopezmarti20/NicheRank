@@ -15,7 +15,7 @@ import os
 """
 
 DATABASE_DIR = "NicheRank/algo_src/database"
-DEFAULT_DATABASE = "database_100000.json"
+DEFAULT_DATABASE = "database_10000.json"
 
 EXAMPLE_USERS_DIR = "NicheRank/algo_src/example_user_history"
 DEFAULT_EXAMPLE_USER = ""
@@ -56,10 +56,10 @@ def get_metrics_fake_user(history_size, database_name=DEFAULT_DATABASE, pop_leve
 
     return metrics
 
-def get_metrics_spotify_user(spotify_history_path, database_name=DEFAULT_DATABASE,
+def get_metrics_spotify_user(history, database_name=DEFAULT_DATABASE,
                              sorting_type="q") -> User_Metrics:
     """
-        spotify_history_path: path to .json spotify file response
+        history: either a str path to .json spotify file response, or a dictionary of the json response
         database_name: name of database to use
         sorting_type: q or m for quicksort or mergesort
 
@@ -68,9 +68,9 @@ def get_metrics_spotify_user(spotify_history_path, database_name=DEFAULT_DATABAS
     # generate database 
     database_path = os.path.join(DATABASE_DIR, database_name)
     database = fm.deserialize_database(database_path)
-
+    
     # parse history 
-    song_history:List[md.Song] = fm.parse_spotify_history_json(spotify_history_path)
+    song_history:List[md.Song] = fm.parse_spotify_history_json(history)
 
     # generate metrics
     metrics_engine = Mainstream_Engine(history=song_history, database=database)
@@ -93,10 +93,14 @@ def test_fake_user_gen_examples():
     
     print("finished testing all the parts!")
 
-def main():
+def large_user_test():
+
     get_metrics_fake_user(history_size=100000, pop_level="med", gen_type="greedy", sorting_type="q")
     get_metrics_fake_user(history_size=100000, pop_level="low", gen_type="greedy", sorting_type="m")
-    
+
+
+def main():
+    test_fake_user_gen_examples()
 
 if __name__ == "__main__":
     main()
