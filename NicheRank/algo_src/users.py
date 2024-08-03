@@ -103,25 +103,27 @@ class UserManager():
         stats_normed:List[Tuple[str, float]] = UserManager.normalize_pop_list(stats_list)
 
         i = 0
+        local_size = 10
         history:List[str] = [None] * size
 
         while (i < size):
-            choices = [None] * num_choices
-            for j in range(num_choices): 
-                choice_indx = random.randint(0, len(stats_normed))
-                choices[j] = stats_list[choice_indx]
+            choices = [None] * local_size
+            for j in range(local_size): 
+                rand_idx = random.randint(0, len(stats_normed) - 1)
+                choices[j] = stats_normed[rand_idx]
             # we now want the small, medium, or large 
             # choose the smallest, medium or large value by using a heap 
             Sorter.quicksort(choices)
             if pop_level == "low":
-                choose_idx = num_choices
+                choose_idx = local_size - 1
             elif pop_level == "med":
-                choose_idx = num_choices//2
+                choose_idx = local_size//2
             elif pop_level == "high":
                 choose_idx = 0
 
             # add this song this many times!
             times_listened = int(random.randint(0, max_times_listened) * spontiniety)
+            j = 0
             while (j < times_listened and i < size):
                 history[i] = choices[choose_idx]
                 j += 1
