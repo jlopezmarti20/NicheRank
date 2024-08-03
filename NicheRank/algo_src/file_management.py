@@ -17,8 +17,6 @@ import music_dataclass as md
 """
 
 
-
-
 def deserialize_database(stats_json_path) -> Dict[Dict[str, md.Artist_Stat], Dict[str, md.Song_Stat]]:
     # Database_json -> Database Dict with artist_stats: and song_stats:
     with open(stats_json_path, 'r') as f:

@@ -1,10 +1,14 @@
 import os
+import json
 from flask import Flask, request, redirect, session, url_for
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.cache_handler import FlaskSessionCacheHandler
+
 import NicheRank.algo_src.control as ctrl 
 from NicheRank.algo_src.analyze_history import User_Metrics
+
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(64)
@@ -53,6 +57,11 @@ def get_recently_played():
     #song_names_html = '<br>'.join([f'{name}: <a href="{url}">{url}</a>' if url else name for name, url in song_uri])
 
     #gets only uris in a list, not formatted
+    
+    file_path = "file_save_location"
+    with open(file_path, "w") as f:
+        json.dump(data, f)
+    
     sorting_type = "q" # can be q or m
     metrics: User_Metrics = ctrl.get_metrics_spotify_user(data, database_name=ctrl.DEFAULT_DATABASE, sorting_type=sorting_type)
     return song_uris
