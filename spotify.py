@@ -8,8 +8,6 @@ from spotipy.cache_handler import FlaskSessionCacheHandler
 import NicheRank.algo_src.control as ctrl 
 from NicheRank.algo_src.analyze_history import User_Metrics
 
-
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(64)
 
