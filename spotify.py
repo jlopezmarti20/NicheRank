@@ -4,6 +4,9 @@ from flask import Flask, request, redirect, session, url_for
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.cache_handler import FlaskSessionCacheHandler
+import sys
+
+sys.path.append("NicheRank/algo_src")
 
 import NicheRank.algo_src.control as ctrl 
 from NicheRank.algo_src.analyze_history import User_Metrics
