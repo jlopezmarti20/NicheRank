@@ -75,6 +75,18 @@ def get_metrics_spotify_user(spotify_history_path, database_name=DEFAULT_DATABAS
     metrics = metrics_engine.analyze_history(sorting=sorting_type)
     return metrics
 
+def create_examples():
+    size_choices = [100, 1000, 100000]
+    pop_levels = ["low", "med", "high"]
+    choices = [(100, "low", "greedy"), (100, "med", "greedy"), (100, "high", "greedy")]
+    sorts = ["q", "m"]
+    resulting_metrics = []
+    for size, pop_level, gen_method in choices:
+        for s in sorts:
+            metric = get_metrics_fake_user(history_size=size, pop_level=pop_level, gen_type=gen_method, sorting_type=s)    
+            resulting_metrics.append(metric)
+    print("finished all the parts!")
+
 def main():
     get_metrics_fake_user(history_size=100000, pop_level="med", gen_type="greedy", sorting_type="q")
     get_metrics_fake_user(history_size=100000, pop_level="low", gen_type="greedy", sorting_type="m")

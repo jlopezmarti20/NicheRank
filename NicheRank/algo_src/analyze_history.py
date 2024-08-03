@@ -92,20 +92,24 @@ class Mainstream_Engine():
             Calculates what percentile of listening popularity a users artists stats are at.
         
         """
-
+        # first, lets normalize all the artists
+        min_global = min(artist.popularity for uri, artist in self.g_artists_map)
+        max_global = max(artist.popularity for uri, artist in self.g_artists_map) 
+        
+        normalized_artist_stats = {uri: (artist_stat.popularity - min_global)*100/(max_global - min_global) for uri, artist_stat in self.g_artists_map}
         sum_pop_artists = 0
+        total_songs_listened = 0
 
-        for artist in self.user_artist_stats:
-            if artist.get_uri() in self.g_artists_map:
-
-                artist_global_weight = self.g_artists_map[artist.get_uri()].popularity
+        for artist_stat in self.user_artist_stats:
+            if artist_stat.get_uri() in normalized_artist_stats:
+                artist_global_weight = normalized_artist_stats[artist_stat.get_uri()]
             else:
-                artist_global_weight = 0
+                artist_global_weight = 1
             
+            total_songs_listened += artist_stat.total_songs
+            sum_pop_artists += artist_stat.total_songs * artist_global_weight
 
-            sum_pop_artists += artist.total_songs * artist_global_weight
-
-        avg_artist_pop = sum_pop_artists/len(self.user_artist_stats)
+        avg_artist_pop = sum_pop_artists/total_songs_listened
 
         # now lets find the percentile of this! 
         global_AS_list = [artist_stat for uri, artist_stat in self.g_artists_map.items()]
@@ -113,12 +117,14 @@ class Mainstream_Engine():
         # sorts by most to least popular
         top_artists: List[md.Artist_Stat] = StatSorter.merge_sort_stats(global_AS_list)
 
-        j = 0
+        j = 1
         for (artist_stat) in reversed(top_artists):
-            j += 1
+            # 0 is least popular artist
             if artist_stat.popularity > avg_artist_pop:
                 # we found where this artists placement is 
                 break
+
+            j += 1
 
         
         percentile = j/len(top_artists)
