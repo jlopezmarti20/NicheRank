@@ -28,12 +28,34 @@ def home():
     if not sp_oauth.validate_token(cache_handler.get_cached_token()):
         auth_url = sp_oauth.get_authorize_url()
         return redirect(auth_url)
-    return redirect(url_for('http://127.0.0.1:8000/Score'))
+    return redirect(url_for('get_recently_played'))
 
 @app.route('/callback')
 def callback():
     sp_oauth.get_access_token(request.args['code'])
-    return redirect('http://127.0.0.1:8000/Score') # redirect to score page
+    return redirect('get_recently_played') # redirect to score page
+
+@app.route('/get_recently_played')
+def get_recently_played():
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
+        auth_url = sp_oauth.get_authorize_url()
+        return redirect(auth_url)
+    
+    data = sp.current_user_recently_played()
+    #gets song names with url
+    #song_names_info = [(item['track']['name'], item['track'].get('external_urls', {}).get('spotify', '')) for item in data.get('items', [])]
+    #song_names_html = '<br>'.join([f'{name}: <a href="{url}">{url}</a>' if url else name for name, url in song_names_info])
+
+    #gets uris with urls
+    #song_uri = [(item['track']['uri'], item['track'].get('external_urls', {}).get('spotify', '')) for item in data.get('items', [])]
+    #song_names_html = '<br>'.join([f'{name}: <a href="{url}">{url}</a>' if url else name for name, url in song_uri])
+
+    #gets only uris in a list, not formatted
+    song_uris = [item['track']['uri'] for item in data.get('items', [])]
+    print(song_uris)
+
+    return song_uris
+    
 
 @app.route('/logout')
 def logout():
