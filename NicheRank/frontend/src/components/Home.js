@@ -13,6 +13,10 @@ function App() {
   const location = useLocation();
   const isHomePage = location.pathname === "/";
 
+  const handleLogin = () => {
+    window.location.href = "http://127.0.0.1:5000/"; // Redirect to Flask backend for authentication
+  };
+
   return (
     <div
       style={{
@@ -37,7 +41,7 @@ function App() {
                   component="h4"
                   variant="h4"
                   style={{
-                    fontSize: "2.5rem", // Increase font size for home page
+                    fontSize: "2.5rem",
                     fontWeight: "bold",
                     position: "relative",
                     top: -100,
@@ -52,7 +56,7 @@ function App() {
                   component="h6"
                   variant="h6"
                   style={{
-                    fontSize: "2rem", // Increase font size for home page
+                    fontSize: "2rem",
                     color: "#fff",
                     position: "relative",
                     top: -90,
@@ -73,8 +77,7 @@ function App() {
                     padding: "10px",
                     fontSize: "2rem",
                   }}
-                  to="/Score"
-                  component={Link}
+                  onClick={handleLogin} // on click go to spotify auth
                 >
                   Login
                 </Button>
