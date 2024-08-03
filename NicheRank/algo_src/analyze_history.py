@@ -93,37 +93,42 @@ class Mainstream_Engine():
 
     def calculate_percentile(user_AS:List[md.Artist_Stat], global_AS_map: Dict[str, md.Artist_Stat]):
 
-            """
-                Calculates what percentile of listening popularity a users artists stats are at.
+        """
+            Calculates what percentile of listening popularity a users artists stats are at.
+        
+        """
+        # first, lets normalize all the artists
+        min_global = min(artist.popularity for uri, artist in self.g_artists_map)
+        max_global = max(artist.popularity for uri, artist in self.g_artists_map) 
+        
+        normalized_artist_stats = {uri: (artist_stat.popularity - min_global)*100/(max_global - min_global) for uri, artist_stat in self.g_artists_map}
+        sum_pop_artists = 0
+        total_songs_listened = 0
+
+        for artist_stat in self.user_artist_stats:
+            if artist_stat.get_uri() in normalized_artist_stats:
+                artist_global_weight = normalized_artist_stats[artist_stat.get_uri()]
+            else:
+                artist_global_weight = 1
             
-            """
+            total_songs_listened += artist_stat.total_songs
+            sum_pop_artists += artist_stat.total_songs * artist_global_weight
 
-            sum_pop_artists = 0
-
-            for artist in user_AS:
-                artist_global_weight = global_AS_map[artist.get_uri()].popularity
-                
-                if artist_global_weight == None:
-                    # if the artists isnt on the list, they must not be popular
-                    artist_global_weight = 0
+        avg_artist_pop = sum_pop_artists/total_songs_listened
 
                 sum_pop_artists += artist.total_songs * artist_global_weight
 
             avg_artist_pop = sum_pop_artists/len(user_AS)
 
-            # now lets find the percentile of this! 
-            global_AS_list = [artist_stat for uri, artist_stat in global_AS_map.items()]
+        j = 1
+        for (artist_stat) in reversed(top_artists):
+            # 0 is least popular artist
+            if artist_stat.popularity > avg_artist_pop:
+                # we found where this artists placement is 
+                break
 
-            # sorts by most to least popular
-            top_artists: List[md.Artist_Stat] = Local_StatSort.merge_sort(global_AS_list)
+            j += 1
 
-            j = 0
-            for (artist_stat) in reversed(top_artists):
-                j += 1
-                if artist_stat.popularity > avg_artist_pop:
-                    # we found where this artists placement is 
-                    break
-
-            
-            percentile = j/len(top_artists)
-            return percentile
+        
+        percentile = j/len(top_artists)
+        return percentile
