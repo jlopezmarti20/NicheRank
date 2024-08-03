@@ -7,25 +7,14 @@ export default class Score extends Component {
     super(props);
     this.state = {
       user: "Jesus",
-      playlist: [
-        "Song #1",
-        "song #2",
-        "song #3",
-        "song #4",
-        "song #5",
-        "Song #1",
-        "song #2",
-        "song #3",
-        "song #4",
-        "song #5",
-      ],
+      playlist: ["Song #1"],
       obscurityScore: 72,
     };
   }
 
-  // componentDidMount() {
-  //   // Fetch playlist data
-  // }
+  componentDidMount() {
+    // Fetch playlist data
+  }
 
   render() {
     const { user, playlist, obscurityScore } = this.state;
