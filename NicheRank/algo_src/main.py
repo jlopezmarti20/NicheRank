@@ -2,6 +2,8 @@ import file_management as fm
 import music_dataclass as md
 from analyze_history import Mainstream_Engine, User_Metrics
 from users import UserManager
+import itertools
+
 
 from typing import List, Dict
 import os
@@ -75,17 +77,21 @@ def get_metrics_spotify_user(spotify_history_path, database_name=DEFAULT_DATABAS
     metrics = metrics_engine.analyze_history(sorting=sorting_type)
     return metrics
 
-def create_examples():
+def test_fake_user_gen_examples():
     size_choices = [100, 1000, 100000]
     pop_levels = ["low", "med", "high"]
-    choices = [(100, "low", "greedy"), (100, "med", "greedy"), (100, "high", "greedy")]
+    gen_types = ["greedy"]
     sorts = ["q", "m"]
+    test_combinations = itertools.product(size_choices, pop_levels, gen_types, sorts)
     resulting_metrics = []
-    for size, pop_level, gen_method in choices:
-        for s in sorts:
-            metric = get_metrics_fake_user(history_size=size, pop_level=pop_level, gen_type=gen_method, sorting_type=s)    
-            resulting_metrics.append(metric)
-    print("finished all the parts!")
+    print("Testing creation of fake users")
+    for size, pop_level, gen_type, s in test_combinations:
+        print(f"testing {size} {pop_level} {gen_type} {s}")
+        metric = get_metrics_fake_user(history_size=size, pop_level=pop_level, gen_type=gen_type, sorting_type=s)    
+        resulting_metrics.append(metric)
+        print(f"finished\n")
+    
+    print("finished testing all the parts!")
 
 def main():
     get_metrics_fake_user(history_size=100000, pop_level="med", gen_type="greedy", sorting_type="q")
