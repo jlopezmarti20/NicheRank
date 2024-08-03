@@ -62,9 +62,8 @@ def get_recently_played():
     with open(file_path, "w") as f:
         json.dump(data, f)
     
-    sorting_type = "q" # can be q or m
-    metrics: User_Metrics = ctrl.get_metrics_spotify_user(data, database_name=ctrl.DEFAULT_DATABASE, sorting_type=sorting_type)
-    return song_uris
+    redirect_uri = 'http://127.0.0.1:8000/Score'
+    return redirect(redirect_uri)
 
 @app.route('/logout')
 def logout():
