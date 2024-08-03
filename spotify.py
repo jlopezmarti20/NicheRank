@@ -5,11 +5,11 @@ from spotipy.oauth2 import SpotifyOAuth
 from spotipy.cache_handler import FlaskSessionCacheHandler
 
 app = Flask(__name__)
-app.config['SECRETKEY'] = os.urandom(64)
+app.config['SECRET_KEY'] = os.urandom(64)
 
 client_id = '52500f70b3534d0bae16a8efac5a70af'
 client_secret = '42de3627a2d14129a605b2472cefbfc3'
-redirect_uri = 'http://127.0.0.1:8000/Score' # change this to website url
+redirect_uri = 'http://localhost:5000/callback'
 scope = 'user-read-recently-played'
 
 cache_handler = FlaskSessionCacheHandler(session)
@@ -33,12 +33,73 @@ def home():
 @app.route('/callback')
 def callback():
     sp_oauth.get_access_token(request.args['code'])
-    return redirect('get_recently_played') # redirect to score page
+    return redirect(url_for('get_recently_played'))
 
 @app.route('/get_recently_played')
 def get_recently_played():
     if not sp_oauth.validate_token(cache_handler.get_cached_token()):
         auth_url = sp_oauth.get_authorize_url()
+        return redirect(auth_url)
+    
+    data = sp.current_user_recently_played()
+    #gets song names with url
+    #song_names_info = [(item['track']['name'], item['track'].get('external_urls', {}).get('spotify', '')) for item in data.get('items', [])]
+    #song_names_html = '<br>'.join([f'{name}: <a href="{url}">{url}</a>' if url else name for name, url in song_names_info])
+
+    #gets uris with urls
+    #song_uri = [(item['track']['uri'], item['track'].get('external_urls', {}).get('spotify', '')) for item in data.get('items', [])]
+    #song_names_html = '<br>'.join([f'{name}: <a href="{url}">{url}</a>' if url else name for name, url in song_uri])
+
+    #gets only uris in a list, not formatted
+    song_uris = [item['track']['uri'] for item in data.get('items', [])]
+    
+    return song_uris
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
+"""
+client_id = '52500f70b3534d0bae16a8efac5a70af'
+client_secret = '42de3627a2d14129a605b2472cefbfc3'
+redirect_uri = 'http://localhost:5000/callback' # change this to website url
+scope = 'user-read-recently-played'
+
+cache_handler = FlaskSessionCacheHandler(session)
+sp_oauth = SpotifyOAuth(
+    client_id=client_id,
+    client_secret=client_secret,
+    redirect_uri=redirect_uri,
+    scope=scope,
+    cache_handler=cache_handler,
+    show_dialog=True
+)
+sp = Spotify(auth_manager=sp_oauth)
+
+@app.route('/')
+def home():
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
+        auth_url = sp_oauth.get_authorize_url()
+        return redirect(auth_url)
+    return redirect(url_for('get_recently_played'))
+
+@app.route('/callback')
+def callback():
+    sp_oauth.get_access_token(request.args['code'])
+    print("in the /callback")
+    return redirect(url_for('get_recently_played'))
+
+@app.route('/get_recently_played')
+def get_recently_played():
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
+        auth_url = sp_oauth.get_authorize_url()
+        print('hello')
         return redirect(auth_url)
     
     data = sp.current_user_recently_played()
@@ -64,7 +125,7 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
+"""
 
 """
 THIS IS A PREVIOUS COPY - NEED SO THAT I CAN RETURN THE SONG URIS
