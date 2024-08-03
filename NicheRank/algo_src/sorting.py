@@ -263,7 +263,6 @@ class Local_StatSort():
         Stat sort sorts descending by which Stats most listened to   
     """
 
-
     def merge_sort(stats_list:List[Union[md.Song_Stat, md.Artist_Stat]]):
         # remember must be stats!!
         # convert to tuples
