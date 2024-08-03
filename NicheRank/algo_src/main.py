@@ -25,6 +25,18 @@ def get_global_songstats()->Dict[str, md.Song_Stat]:
     songs_database = "NicheRank/algo_src/playlist_stats/song_stats_10000.json"
     return fm.global_playlist_to_music_dict(songs_database)
 
+def create_examples():
+    size_choices = [100, 1000, 100000]
+    pop_levels = ["low", "med", "high"]
+    choices = [(100, "low", "greedy"), (100, "med", "greedy"), (100, "high", "greedy")]
+    sorts = ["q", "m"]
+    resulting_metrics = []
+    for size, pop_level, gen_method in choices:
+        for s in sorts:
+            metric = get_metrics_fake_user(history_size=size, pop_level=pop_level, gen_type=gen_method, sorting_type=s)    
+            resulting_metrics.append(metric)
+    print("finished all the parts!")
+
 def main():
 
     json_history_path:str = get_history_path()
