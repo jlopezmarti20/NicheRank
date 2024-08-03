@@ -34,12 +34,8 @@ class User_Metrics:
 # Behavior Class
 class Mainstream_Engine():
 
-    def __init__(self, history: List[md.Song], database: Dict[str, md.Artist_Stat], sorting="q") -> None:
+    def __init__(self, history: List[md.Song], database: Dict[str, md.Artist_Stat]) -> None:
         # sorting is q for quick, m for merge
-        if sorting not in ["m", "q"]:
-            return None
-        
-        self.sorting = sorting
         self.song_history = history
 
         self.user_artist_stats: List[md.Artist_Stat] = md.Stats_Extractor.extract_artist_stats_from_songs(history)
@@ -48,35 +44,35 @@ class Mainstream_Engine():
         self.g_artists_map: Dict[str, md.Artist_Stat] = database["artist_stats"]
         self.g_songs_map: Dict[str, md.Song_Stat] = database["song_stats"]
 
-    def analyze_history(self) -> User_Metrics:
+    def analyze_history(self, sorting="q") -> User_Metrics:
 
-        artist_metrics = self.calculate_artist_metrics()
-        song_metrics = self.calculate_song_metrics()
+        artist_metrics = self.calculate_artist_metrics(sorting)
+        song_metrics = self.calculate_song_metrics(sorting)
         time_listened_s = sum(artist_stat.total_s for artist_stat in self.user_artist_stats)
         pop_score = self.calculate_mainstream_score()        
         cur_metric = User_Metrics(artist_metrics=artist_metrics, song_metrics=song_metrics, time_listened_s=time_listened_s, pop_score=pop_score)
 
         return cur_metric
     
-    def calculate_artist_metrics(self) -> Artist_Metrics:
+    def calculate_artist_metrics(self, sorting) -> Artist_Metrics:
         # Artist Metrics
-        if self.sorting == "q":
+        if sorting == "q":
             favorite_artists: List[md.Artist_Stat] = StatSorter.quicksort_stats(self.user_artist_stats)
             popular_artists: List[md.Artist_Stat] = GlobalSorter.quicksort_stats(self.user_artist_stats, self.g_artists_map)
-        elif self.sorting == "m":
+        elif sorting == "m":
             favorite_artists: List[md.Artist_Stat] = StatSorter.merge_sort_stats(self.user_artist_stats)
             popular_artists: List[md.Artist_Stat] = GlobalSorter.merge_sort_stats(self.user_artist_stats, self.g_artists_map)  
         artist_metrics = Artist_Metrics(favorites=favorite_artists,most_popular=popular_artists,num_listened=len(favorite_artists) )
         return artist_metrics
     
-    def calculate_song_metrics(self) -> Song_Metrics:
+    def calculate_song_metrics(self, sorting) -> Song_Metrics:
 
         # get song metrics
-        if self.sorting == "q":
+        if sorting == "q":
 
             favorite_songs: List[md.Song_Stat] = StatSorter.quicksort_stats(self.user_song_stats)
             popular_songs: List[md.Song_Stat] = GlobalSorter.quicksort_stats(self.user_song_stats, self.g_songs_map)  
-        elif self.sorting == "m":
+        elif sorting == "m":
             favorite_songs: List[md.Song_Stat] = StatSorter.merge_sort_stats(self.user_song_stats)
             popular_songs: List[md.Song_Stat] = GlobalSorter.merge_sort_stats(self.user_song_stats, self.g_songs_map)   
         
