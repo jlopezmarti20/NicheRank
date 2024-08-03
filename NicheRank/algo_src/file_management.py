@@ -16,6 +16,9 @@ import music_dataclass as md
 
 """
 
+
+
+
 def deserialize_database(stats_json_path) -> Dict[Dict[str, md.Artist_Stat], Dict[str, md.Song_Stat]]:
     # Database_json -> Database Dict with artist_stats: and song_stats:
     with open(stats_json_path, 'r') as f:
@@ -42,7 +45,7 @@ def parse_spotify_history_json(response_path:str)->List[md.Song]:
     with open(response_path, "r") as f:
         response_json = json.load(f)
 
-    recently_played: List[md.Song_Stat] = [] # list of song dataclasses
+    recently_played: List[md.Song] = [] # list of song dataclasses
     for play_history in response_json["items"]:
         # organizes json object into more easily parsable list of song dataclasses
 
@@ -56,6 +59,27 @@ def parse_spotify_history_json(response_path:str)->List[md.Song]:
         recently_played.append(song) 
 
     return recently_played
+
+def create_spotify_response(songs: List[md.Song]) -> dict:
+    """
+    Create a Spotify-like response list from a list of Song objects.
+    """
+    response_items = []
+    for song in songs:
+        track = {
+            "track": {
+                "name": song.name,
+                "uri": song.uri,
+                "artists": [{"name": artist.name, "uri": artist.uri} for artist in song.artists],
+                "duration_ms": int(song.duration_s * 60 * 1000)  # converting back to milliseconds
+            }
+        }
+        response_items.append(track)
+    
+    response = {
+        "items": response_items
+    }
+    return response
 
 class Dataset_Loader:
     """
