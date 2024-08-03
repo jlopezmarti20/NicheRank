@@ -7,20 +7,13 @@ export default class Score extends Component {
     super(props);
     this.state = {
       user: "Jesus",
-      playlist: [
-        "Song 1",
-        "Song 2",
-        "Song 3",
-        "Song 4",
-        "Song 5",
-        "Song 6",
-        "Song 7",
-        "Song 8",
-        "Song 9",
-        "Song 10",
-      ],
-      obscurityScore: 72, // example score
+      playlist: ["Song #1"],
+      obscurityScore: 72,
     };
+  }
+
+  componentDidMount() {
+    // Fetch playlist data
   }
 
   render() {
@@ -44,9 +37,9 @@ export default class Score extends Component {
                   color: "white",
                   fontWeight: "bold",
                   whiteSpace: "nowrap",
-                  borderRadius: "5px", // Rounded borders
+                  borderRadius: "5px",
                   boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                  width: "400px", // Increased width
+                  width: "400px",
                   height: "45px",
                 }}
               >
@@ -75,8 +68,8 @@ export default class Score extends Component {
           to="/"
           component={Link}
           style={{
-            fontSize: "1.5rem", // Adjust the font size as needed
-            padding: "12px 24px", // Adjust the padding for button size
+            fontSize: "1.5rem",
+            padding: "12px 24px",
             position: "absolute",
             top: "10px",
             left: "10px",

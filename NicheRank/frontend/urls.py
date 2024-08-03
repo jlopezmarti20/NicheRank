@@ -3,5 +3,6 @@ from .views import index
 
 urlpatterns = [
     path('', index),
-    path('Score', index)
+    path('Score', index),
+     path('callback', index)
 ]
