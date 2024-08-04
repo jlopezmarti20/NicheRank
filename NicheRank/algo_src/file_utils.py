@@ -116,48 +116,23 @@ def create_spotify_response(songs: List[md.Song]) -> dict:
 
 """
     The dataset loader class is used to load and work with the slices
-    the 1 Million Playlists database uses.
+    of json data the 1 Million Playlists database uses.
 """
 
-class DatasetLoader:
+class DatasetJsonLoader:
 
     def load_slice(slice_path, version="fast")->List[ Tuple[int, List[md.Song]]]:
         # loads into a list of playlists, each holding num_followers and songs in that playlist
         if version == "fast":
-            return DatasetLoader.faster_load_slice(slice_path)
+            return DatasetJsonLoader.load_slice(slice_path)
         
         elif version == "slow":
-            return DatasetLoader.slow_load_slice(slice_path)
+            return DatasetJsonLoader.slow_load_slice(slice_path)
         
         else:
-            return DatasetLoader.faster_load_slice(slice_path)
+            return DatasetJsonLoader.load_slice(slice_path)
 
-    def slow_load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
-        
-        # loads into a list of playlists, each holding num_followers and songs in that playlist
-
-        with open(slice_path, 'r') as f:
-            slice_json = json.load(f)
-
-        parsed_slice:list[(int, list[md.Song])] = []
-
-        for playlist in slice_json["playlists"]:
-            followers = playlist["num_followers"]
-            parsed_playlist = []
-            for track in playlist["tracks"]:
-                song = md.Song(name=track["track_name"], 
-                            uri=track["track_uri"],
-                            artists=[md.Artist(name=track["artist_name"], uri=track["artist_uri"])],
-                            duration_s=track["duration_ms"]/1000
-                            )
-                parsed_playlist.append(song)
-
-            parsed_slice.append((followers, parsed_playlist))
-
-        return parsed_slice
-
-
-    def faster_load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
+    def load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
 
         # use a list comprehension instead
 
@@ -240,40 +215,6 @@ class DatasetToDatabase():
             artist_stats_dict[artist_uri][2] += weighted_listens
             artist_stats_dict[artist_uri][3] += time_s_listened
         return artist_stats_dict
-
-    def extract_dataset_artist_stats(self, load_percent=0.5,json_parse="fast") -> List[(str, str, int, int, int)]:
-        """
-            creates a list of artist stats after parsing through data file using hashmap
-            
-            returns list of artist information as 
-            [(uri_compressed, name, total_listens, weighted_listens, seconds_listened)]
-        """
-
-        if (load_percent < 0.0 or load_percent > 1.0):
-            load_percent = 0.5
-        else:
-            load_percent = load_percent
-
-        num_playlists = int(load_percent * 1_000_000) # how many playlists to parse out of 1M
-        # first, load every artist in every playlist
-        data_dir = os.path.join(self.database_path, 'data')
-        endslice: int = num_playlists // 1000
-        slices: List[str] = os.listdir(data_dir)
-        artist_dict: Dict[str, md.Artist_Stat] = {} # artist_uri: Artist_Stat dataclass
-        slice_range = tqdm(range(endslice + 1), disable= not self.profile)
-
-        for i in slice_range:
-            # current slice has playlists 
-            cur_slice = slices[i]
-            cur_slice_path = os.path.join(data_dir, cur_slice)
-            playlists: List[Tuple[int, List[md.Song]]] = DatasetLoader.load_slice(cur_slice_path, json_parse)
-            
-            for j, (followers, playlist) in enumerate(playlists):
-                if i == endslice and j == num_playlists % 1000:
-                    # for processing final slice
-                    break
-                md.Stats_Extractor.extract_artiststats(playlist, artist_dict, followers=followers)
-        return artist_dict        
         
     def extract_dataset_song_stats(self, load_percent=0.5, json_parse="fast") -> Dict[str, Tuple]:
         """
@@ -298,7 +239,7 @@ class DatasetToDatabase():
         for i in slice_range:
             cur_slice = slices[i]
             cur_slice_path = os.path.join(data_dir, cur_slice)
-            playlists: List[Tuple[int, List[md.Song]]] = DatasetLoader.load_slice(cur_slice_path, json_parse)
+            playlists: List[Tuple[int, List[md.Song]]] = DatasetJsonLoader.load_slice(cur_slice_path, json_parse)
 
             for j, (followers, playlist) in enumerate(playlists):
                 if i == endslice and j == num_playlists % 1000:
