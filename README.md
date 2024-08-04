@@ -14,9 +14,12 @@ To use the database, please do the following:
 Due to the size of the database, we have already created it on our own. If you would like to generate your own database, do the following: 
 
 1. Download zip from https://www.aicrowd.com/challenges/spotify-million-playlist-dataset-challenge#dataset 
-2. Unzip file into the playlist_database folder.
-3. Run the sctip playlist_parse.py with the % of playlists you want to be parsed as a float. The entire database is 1 Million playlists, which takes around 30 minutes. By default, the playlist is 0.1% parsed. 
-    playlist_parse.py --load_percent 0.3 --profile True
+2. Unzip file into the NicheRank/playlist_database folder.
+3. Run the playlist_parse.py as   
+    playlist_parse.py --load_percent 0.3 --profile True 
+    where load_percent is % of million playlists to load and profile is if to display how much time it takes.
+
+Keep in mind, it takes around 1.5 minutes to parse 10% of the database, so either keep the value low or give it some time.
 
 ## Contributors
 Jesus Lopez 
