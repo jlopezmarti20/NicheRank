@@ -11,7 +11,6 @@ sys.path.append("NicheRank/algo_src")
 
 import control as ctrl
 from analyze_history import User_Metrics
-from CONFIG import *
 
 #this is how to start the file with Flask, then create a randomized secret key
 app = Flask(__name__)
@@ -27,6 +26,13 @@ redirect_uri = 'http://localhost:5000/callback'
 #this is what determines what displays when I am asking for user permission for their data
 scope = 'user-read-recently-played'
 
+#CHANGE THIS OPTION FOR DIFFERENT USERS.
+# 0 is spotify login. (spotify accounts need to be authenticated in SfD) login with user: Amanda Brannon pw: Workingonit1!
+# 1,2,3 are differently generated users with 100000 points of data
+user_option = 1
+DEFAULT_DATABASE = 'default_db_100000'
+DATABASE_USED = DEFAULT_DATABASE
+
 #this makes a new session upon opening the page- this is important as the authorization token is only temporary
 cache_handler = FlaskSessionCacheHandler(session)
 sp_oauth = SpotifyOAuth(
@@ -39,13 +45,14 @@ sp_oauth = SpotifyOAuth(
 )
 sp = Spotify(auth_manager=sp_oauth)
 
+
 #this is the landing page. it checks whether you have logged in yet. if you have (you probably haven't) it goes straight to collecting
 #data and automatically rerouting you to your score page. It HAS to redirect to auth_url, or else you will get stuck in a deadlock.
 #that auth_url contains the client id and redirect_uri and looks like 
 #this: https://accounts.spotify.com/authorize?client_id=52500f70b3534d0bae16a8efac5a70af&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fcallback&scope=user-read-recently-played&show_dialog=True
 @app.route('/')
 def home():
-    if (config_dict["use_spotify"] == True):
+    if (user_option == 0):
         if not sp_oauth.validate_token(cache_handler.get_cached_token()):
             auth_url = sp_oauth.get_authorize_url()
             return redirect(auth_url)
@@ -55,7 +62,7 @@ def home():
         return redirect(url_for('get_recently_played'))
 
 
-#this callback functsorting_typeion happens when you have logged in- it authorizes with your access token and reroutes you to collecting data
+#this callback function happens when you have logged in- it authorizes with your access token and reroutes you to collecting data
 #and going to the score page
 @app.route('/callback')
 def callback():
@@ -68,7 +75,7 @@ def callback():
 #so that you can get to your score page (this redirect connection point took us hours to figure out.)
 @app.route('/get_recently_played')
 def get_recently_played():
-    if (config_dict["use_spotify"] == True):
+    if (user_option == 0):
         if not sp_oauth.validate_token(cache_handler.get_cached_token()):
             auth_url = sp_oauth.get_authorize_url()
             return redirect(auth_url)
@@ -85,13 +92,10 @@ def get_recently_played():
 
 @app.route('/user_metrics', methods=['GET'])   #http://127.0.0.1:5000/user_metrics
 def user_metrics():
-
-    sorting_type = config_dict["sorting_type"]
-    database_name = config_dict["database_name"]
-
-    if (config_dict["use_spotify"] == True):
+    if (user_option == 0):
+        sorting_type = "q"  # can be q or m
         history_path = "user_history.json"
-        metrics: User_Metrics = ctrl.get_metrics_spotify_user(history=history_path, sorting_type=sorting_type, database_name=database_name)
+        metrics: User_Metrics = ctrl.get_metrics_spotify_user(history=history_path, sorting_type=sorting_type)
 
         # Access the favorites attribute directly from the Artist_Metrics
         artist_list = metrics.artist_metrics.favorites
@@ -103,6 +107,7 @@ def user_metrics():
         # Access the pop_score attribute
         pop_score = metrics.pop_score
 
+
         # Create a response dictionary containing both the artist list and the pop score
         response = {
             "topArtists": artist_list[:5],  # get only the top 10 favorite artists
@@ -111,17 +116,14 @@ def user_metrics():
         }
 
         return jsonify(response)
-    else :
-        # create our own user using metrics given in config dict  
-        fake_user_config = config_dict["gen_user"]
-        hist_size = fake_user_config["history_size"]
-        pop_level = fake_user_config["pop_level"]
+    elif (user_option == 1):
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="a", sorting_type="q", database_name=DEFAULT_DATABASE)
 
-        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=hist_size, pop_level=pop_level, sorting_type=sorting_type, database_name=database_name)
-        
         artist_list = metrics.artist_metrics.favorites
         song_list = metrics.song_metrics.favorites
+        pop_score=100
         pop_score = metrics.pop_score
+        print(pop_score)
         response = {
             "topArtists": artist_list[:5],
             "pop_score": pop_score,
@@ -129,6 +131,7 @@ def user_metrics():
         }
 
         return jsonify(response)
+
 
 #this never happens since we redirect to the frontend :)
 @app.route('/logout')
