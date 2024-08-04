@@ -4,7 +4,7 @@
 
 To use the database, please do the following:
 1. pip -r requirements.txt
-2. Download the json database files and put which one you would like in NicheRank/algo_src/database
+2. Download the json database files and put which one you would like in NicheRank/database
 3. python3 NicheRank/manage.py runserver
 4. 
 ## Dataset to Database Extraction

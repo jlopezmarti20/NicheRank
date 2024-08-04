@@ -16,7 +16,7 @@ import itertools
     to produce final results.
 """
 
-DATABASE_DIR = "NicheRank/algo_src/database"
+DATABASE_DIR = "NicheRank/database"
 DEFAULT_DATABASE = "database_10000.json"
 
 EXAMPLE_USERS_DIR = "NicheRank/algo_src/example_user_history"

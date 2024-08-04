@@ -18,11 +18,11 @@ class UserManager():
         # database is what music database we are pulling from
 
         if database is None:
-            database_dir = "NicheRank/algo_src/database"
+            database_dir = "NicheRank/database"
             database_path = os.path.join(database_dir, "database_100000.json")
             database = deserialize_database(database_path)
         elif isinstance(database, str):
-            database_dir = "NicheRank/algo_src/database"
+            database_dir = "NicheRank/database"
             database_path = os.path.join(database_dir, database)
             database = deserialize_database(database_path)
 

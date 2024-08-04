@@ -13,6 +13,37 @@ import music as md
     Methods for creating or reading json information and database files.
 """
 
+def deserialize_optimized_database(database_path)->Dict[Dict[str, md.Artist_Stat], Dict[str, md.Song_Stat]]:
+    with open(database_path, 'r') as f:
+        json_data = json.load(f)
+
+    artist_dict = {tup[0]: convert_list_to_stat(tup) for tup in json_data["artist_stats"]}
+    songs_dict = {tup[0]: convert_list_to_stat(tup) for tup in json_data["song_stats"]}
+
+def convert_list_to_stat(tup: Tuple):
+    """
+        Converts a Stat Tuple into a Stat Object
+        Artist: [artist_uri, name, total_listens, weighted_l, sec_l]
+        Song: [song_uri, name, artist_uri_compressed, artist_name, total_listens, weighted_listen, seconds_listened]
+    """
+
+    if len(tup) == 5:
+        artist = md.Artist_Stat(artist=md.Artist(tup[1], tup[0]),
+                                total_s=tup[4],
+                                weighted_listens=tup[3],
+                                total_songs=tup[2])
+        return artist
+    elif len(tup) == 7:
+        song = md.Song_Stat(
+            song=md.Song(
+                name=tup[1],
+                uri=tup[0],
+                artists=[md.Artist(tup[3], tup[2])],
+                
+                ),
+                total_listens=tup[4],
+                weighted_listens=5,)
+        return song
 
 def deserialize_database(stats_json_path) -> Dict[Dict[str, md.Artist_Stat], Dict[str, md.Song_Stat]]:
     # converts Database_json into Database Dict with artist_stats: and song_stats:
@@ -168,7 +199,7 @@ class DatasetToDatabase():
         """
         self.database_path = database_path 
         self.profile = profile
-        self.save_location = "NicheRank/algo_src/database"
+        self.save_location = "NicheRank/database"
 
         # check if database path exists
         if (not os.path.exists(self.database_path)):
@@ -182,8 +213,8 @@ class DatasetToDatabase():
         
         num_playlists = int(load_percent * 1_000_000)
         database = {
-                    "artist_stats": artist_database, 
-                    "song_stats": song_database
+                    "artist_stats": [ (uri, *stats) for uri, stats in artist_database], 
+                    "song_stats": [(uri, *stats) for uri, stats in song_database]
                     }
         # now save these as a database class
         save_name = f"database_{num_playlists}.json"
@@ -248,7 +279,7 @@ class DatasetToDatabase():
         """
             Creates a list of song_stats (unordered)
             returns dict of song info as 
-            {str: (uri_compressed, name, artist_uri_compressed, total_listens, weighted_listen, seconds_listened)}
+            {str: (name, artist_uri_compressed, total_listens, weighted_listen, seconds_listened)}
         
         """
         if (load_percent < 0.0 or load_percent > 1.0):
