@@ -12,14 +12,14 @@ from sorting import StatSorter, GlobalSorter
 
 @dataclass
 class Artist_Metrics:
-    favorites: List[str]
-    most_popular: List[str]
+    favorites: List[md.Artist_Stat]
+    most_popular: List[md.Artist_Stat]
     num_listened: int # number of artists listened to 
 
 @dataclass
 class Song_Metrics:
-    favorites: List[str]
-    most_popular: List[str]
+    favorites: List[md.Song_Stat]
+    most_popular: List[md.Song_Stat]
     num_listened: int
 
 @dataclass
@@ -65,20 +65,13 @@ class HistoryAnalyzer():
     
     def calculate_artist_metrics(self, sorting) -> Artist_Metrics:
         # Artist Metrics
-        num_shown = 10 if 10 > len(self.user_artist_stats) else len(self.user_artist_stats)
-        
         if sorting == "q":
             favorite_artists: List[md.Artist_Stat] = StatSorter.quicksort_stats(self.user_artist_stats)
             popular_artists: List[md.Artist_Stat] = GlobalSorter.quicksort_stats(self.user_artist_stats, self.g_artists_map)
         elif sorting == "m":
             favorite_artists: List[md.Artist_Stat] = StatSorter.merge_sort_stats(self.user_artist_stats)
             popular_artists: List[md.Artist_Stat] = GlobalSorter.merge_sort_stats(self.user_artist_stats, self.g_artists_map)  
-        
-        fav_10 = favorite_artists[:num_shown]
-        pop_10 = popular_artists[:num_shown]
-        fav_10 = [stat.artist.name for stat in fav_10]
-        pop_10 = [stat.artist.name for stat in pop_10]
-        artist_metrics = Artist_Metrics(favorites=fav_10,most_popular=pop_10,num_listened=len(favorite_artists) )
+        artist_metrics = Artist_Metrics(favorites=favorite_artists,most_popular=popular_artists,num_listened=len(favorite_artists) )
         return artist_metrics
     
     def calculate_song_metrics(self, sorting) -> Song_Metrics:
@@ -91,12 +84,8 @@ class HistoryAnalyzer():
         elif sorting == "m":
             favorite_songs: List[md.Song_Stat] = StatSorter.merge_sort_stats(self.user_song_stats)
             popular_songs: List[md.Song_Stat] = GlobalSorter.merge_sort_stats(self.user_song_stats, self.g_songs_map)   
-        num_shown = 10 if 10 > len(self.user_song_stats) else len(self.user_song_stats)
-        pop_10 = popular_songs[:num_shown]
-        fav_10 = favorite_songs[:num_shown]
-        pop_10 = [stat.song.name for stat in pop_10]
-        fav_10 = [stat.song.name for stat in fav_10]
-        song_met = Song_Metrics(favorites=fav_10, most_popular=pop_10, num_listened=len(favorite_songs))
+        
+        song_met = Song_Metrics(favorites=favorite_songs, most_popular=popular_songs, num_listened=len(favorite_songs))
         
         return song_met
  
