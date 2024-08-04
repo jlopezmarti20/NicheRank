@@ -38,7 +38,6 @@ class Artist_Stat:
     artist:Artist = None
     total_s: int = None
     total_songs: int = None
-    total_playlists:int = None # how many unique playlists out of 1 million this artist was on 
     weighted_listens: int = None # summation of each listen multiplied by the followers of that song artist
 
     @property
@@ -57,7 +56,6 @@ class Artist_Stat:
             artist=self.artist,
             total_s=self.total_s + other.total_s,
             total_songs=self.total_songs + other.total_songs,
-            total_playlists=self.total_playlists + other.total_playlists,
             weighted_listens=self.weighted_listens + other.weighted_listens
         )
     
@@ -130,7 +128,6 @@ def convert_dict_to_music(json_dict):
         return Artist_Stat(artist=convert_dict_to_music(json_dict["artist"]),
                               total_s=json_dict["total_s"],
                               total_songs=json_dict["total_songs"] ,
-                              total_playlists=json_dict["total_playlists"],
                               weighted_listens=json_dict["weighted_listens"])
     
     elif "song" in json_dict:
@@ -159,7 +156,6 @@ def convert_music_to_dict(music)-> dict:
             'artist':convert_music_to_dict(music.artist),
             'total_s': music.total_s,
             'total_songs': music.total_songs,
-            'total_playlists': music.total_playlists,
             'weighted_listens': music.weighted_listens
         }
         
@@ -192,18 +188,15 @@ class Stats_Extractor():
         return [stat for uri, stat in AS_dict.items()]
 
     def extract_artiststats(songs:List[Song], artist_stats_dict:Dict[str, Artist_Stat], followers):
-        seen_artists = set()
         
         for song in songs:
             for artist in song.artists:
                 if artist.uri not in artist_stats_dict:
-                    artist_stats_dict[artist.uri] = Artist_Stat(artist=artist, total_playlists=0, total_s=0, total_songs=0, weighted_listens=0)
+                    artist_stats_dict[artist.uri] = Artist_Stat(artist=artist, total_s=0, total_songs=0, weighted_listens=0)
                 artist_stats_dict[artist.uri].total_s += song.duration_s
                 artist_stats_dict[artist.uri].weighted_listens += followers
                 artist_stats_dict[artist.uri].total_songs += 1
-                if artist.uri not in seen_artists:
-                    artist_stats_dict[artist.uri].total_playlists += 1
-                    seen_artists.add(artist.uri)
+
     
     def extract_song_stats_from_songs(songs: List[Song]) -> List[Song_Stat]:
         SS_dict = {}

@@ -14,7 +14,6 @@ def create_dummy_artiststats(listens) -> List[md.Artist_Stat]:
     return [md.Artist_Stat(artist=md.Artist(name=str(i), uri=str(i)),
                            total_s=listen, 
                            total_songs=listen, 
-                           total_playlists=listen//2, 
                            weighted_listens=listen) 
             for i,(listen) in enumerate(listens)]
 
