@@ -17,8 +17,7 @@ import itertools
 DATABASE_DIR = "NicheRank/database"
 DEFAULT_DATABASE = "default_db_10000" # by default use the 100_000 songs database
 
-EXAMPLE_USERS_DIR = "NicheRank/algo_src/example_user_history"
-DEFAULT_EXAMPLE_USER = ""
+EXAMPLE_USERS_DIR = "NicheRank/example_users"
 
 
 def test_generate_history():

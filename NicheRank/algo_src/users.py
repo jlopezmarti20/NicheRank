@@ -7,6 +7,8 @@ from file_utils import deserialize_database, parse_spotify_history_json, create_
 from sorting import Sorter
 import music as md
 
+DEFAULT_USERS_DIR = "NicheRank/example_users"
+
 """
     UserManager generates example histories of various popularity 
     levels as if you have requested from spotify your requests.
@@ -28,7 +30,7 @@ class UserManager():
 
         self.database_artist_stats = database["artist_stats"]
         self.database_song_stats = database["song_stats"]
-        self.users_dir = "NicheRank/algo_src/example_user_history"
+        self.users_dir = DEFAULT_USERS_DIR
 
     def generate_user_history(self, size, pop_level="med", name=None, gen_type="greedy") -> str:
         """
