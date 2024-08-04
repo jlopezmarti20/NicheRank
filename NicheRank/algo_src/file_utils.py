@@ -1,7 +1,6 @@
 import json
 from typing import List, Tuple, Dict, Union
 import os
-from dataclasses import asdict
 from tqdm import tqdm
 import sys
 import os
@@ -9,58 +8,53 @@ import sys
 
 import music as md
 
+DEFAULT_DATASET_LOCATION = "NicheRank/playlist_dataset"
+DEFAULT_DATABASE_DIRECTORY = "NicheRank/database"
+
 """
     Methods for creating or reading json information and database files.
 """
 
-def deserialize_optimized_database(database_path)->Dict[Dict[str, md.Artist_Stat], Dict[str, md.Song_Stat]]:
-    with open(database_path, 'r') as f:
-        json_data = json.load(f)
+def deserialize_database(database_path)->Dict[Dict[str, md.Artist_Stat], Dict[str, md.Song_Stat]]:
+    # turns a database of json files into a dictionary of Music Objects
+    artist_path = os.path.join(database_path, "artist_stats.json")
+    song_path = os.path.join(database_path, "song_stats.json")
+    
+    with open(artist_path, 'r') as f:
+        artist_stats = json.load(f)
 
-    artist_dict = {tup[0]: convert_list_to_stat(tup) for tup in json_data["artist_stats"]}
-    songs_dict = {tup[0]: convert_list_to_stat(tup) for tup in json_data["song_stats"]}
+    with open(song_path, 'r') as f:
+        song_stats = json.load(f)
+
+    artist_dict = {tup[0]: convert_list_to_stat(tup) for tup in artist_stats}
+    songs_dict = {tup[0]: convert_list_to_stat(tup) for tup in song_stats}
+
+    return {"artist_stats": artist_dict,
+            "song_stats": songs_dict}
 
 def convert_list_to_stat(tup: Tuple):
     """
         Converts a Stat Tuple into a Stat Object
-        Artist: [artist_uri, name, total_listens, weighted_l, sec_l]
-        Song: [song_uri, name, artist_uri_compressed, artist_name, total_listens, weighted_listen, seconds_listened]
+        Artist: [artist_uri, name, total_listens, weighted_l]
     """
 
     if len(tup) == 5:
         artist = md.Artist_Stat(artist=md.Artist(tup[1], tup[0]),
-                                total_s=tup[4],
                                 weighted_listens=tup[3],
-                                total_songs=tup[2])
+                                total_listens=tup[2])
         return artist
     elif len(tup) == 7:
+        # [song_uri, name, artist_uri_compressed, artist_name, total_listens, weighted_listen]
         song = md.Song_Stat(
             song=md.Song(
-                name=tup[1],
-                uri=tup[0],
-                artists=[md.Artist(tup[3], tup[2])],
-                
+                    name=tup[1],
+                    uri=tup[0],
+                    artists=[md.Artist(uri=tup[3], name=tup[2])],
                 ),
                 total_listens=tup[4],
-                weighted_listens=5,)
+                weighted_listens=[5]
+                )
         return song
-
-def deserialize_database(stats_json_path) -> Dict[Dict[str, md.Artist_Stat], Dict[str, md.Song_Stat]]:
-    # converts Database_json into Database Dict with artist_stats: and song_stats:
-    with open(stats_json_path, 'r') as f:
-        json_data = json.load(f)
-
-    artists_dict = {uri: md.convert_dict_to_music(artist) for uri, artist in json_data["artist_stats"].items()}
-    songs_dict = {uri: md.convert_dict_to_music(song_stat) for uri, song_stat in json_data["song_stats"].items()}
-    return {"artist_stats": artists_dict,
-            "song_stats": songs_dict}
-
-class CustomJSONEncoder(json.JSONEncoder):
-    # encodes a music object into a dictionary
-    def default(self, obj):
-        if isinstance(obj, (md.Artist_Stat, md.Song_Stat, md.Artist, md.Song)):
-            return md.convert_music_to_dict(obj)
-        return super().default(obj)
 
 def parse_spotify_history_json(response)->List[md.Song]:
     """
@@ -120,18 +114,6 @@ def create_spotify_response(songs: List[md.Song]) -> dict:
 """
 
 class DatasetJsonLoader:
-
-    def load_slice(slice_path, version="fast")->List[ Tuple[int, List[md.Song]]]:
-        # loads into a list of playlists, each holding num_followers and songs in that playlist
-        if version == "fast":
-            return DatasetJsonLoader.load_slice(slice_path)
-        
-        elif version == "slow":
-            return DatasetJsonLoader.slow_load_slice(slice_path)
-        
-        else:
-            return DatasetJsonLoader.load_slice(slice_path)
-
     def load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
 
         # use a list comprehension instead
@@ -164,41 +146,46 @@ class DatasetJsonLoader:
 """
 class DatasetToDatabase():
 
-    def __init__(self, database_path, profile=False) -> None:
+    def __init__(self, dataset_path=DEFAULT_DATASET_LOCATION, save_location=DEFAULT_DATABASE_DIRECTORY, profile=False) -> None:
         
         """
-            playlist_path: path to the database file
+            playlist_path: path to the database file to be saved
             load_percent: what percent of the million databases to load (default is max)
             sorting_algorithm: which sorting algorithm to use for this ("map", "merge") are 2 
             profile: if to profile and track sorting time
         """
-        self.database_path = database_path 
+        self.dataset_path = dataset_path 
         self.profile = profile
-        self.save_location = "NicheRank/database"
+        self.save_location = save_location
 
         # check if database path exists
-        if (not os.path.exists(self.database_path)):
-            raise IOError(f'File doesnt exist: {self.database_path}')
+        if (not os.path.exists(self.dataset_path)):
+            raise IOError(f'File doesnt exist: {self.dataset_path}')
         
     def create_database(self, load_percent=0.5, save=True):
 
         # loads both artist and music stats together
-        song_database: Dict[str, Tuple] = self.extract_dataset_song_stats(load_percent=load_percent)
-        artist_database: Dict[str, Tuple] = self.extract_artiststats_from_song_database(song_database, load_percent=load_percent)
+        songstat_dir: Dict[str, Tuple] = self.extract_dataset_song_stats(load_percent=load_percent)
+        artiststat_dir: Dict[str, Tuple] = self.extract_artiststats_from_song_database(songstat_dir, load_percent=load_percent)
         
         num_playlists = int(load_percent * 1_000_000)
-        database = {
-                    "artist_stats": [ (uri, *stats) for uri, stats in artist_database], 
-                    "song_stats": [(uri, *stats) for uri, stats in song_database]
-                    }
-        # now save these as a database class
-        save_name = f"database_{num_playlists}.json"
-        save_path = os.path.join(self.save_location, save_name)
+        artist_stats = [ (uri, *stats) for uri, stats in artiststat_dir.items()]
+        song_stats = [(uri, *stats) for uri, stats in songstat_dir.items()]
 
-        with open(save_path, "w") as f:
-            json.dump(database, f, cls=CustomJSONEncoder, indent=2)
+        # now save these into a directory with artists json and songs json
+        dir_name = f"db_{num_playlists}"
+        save_path = os.path.join(self.save_location, dir_name)
+        os.mkdir(save_path)
+        # save song and artist stats into their sperate json files
+        artiststats_path = os.path.join(save_path, "artist_stats.json")
+        with open(artiststats_path, "w") as f:
+            json.dump(artist_stats, f)
 
-    def extract_artiststats_from_song_database(self, song_database:Dict[str, Tuple], load_percent) -> Dict[str, Tuple]:
+        songstats_path = os.path.join(save_path, "song_stats.json")
+        with open(songstats_path, "w") as f:
+            json.dump(song_stats, f)
+
+    def extract_artiststats_from_song_database(self, song_database:Dict[str, List], load_percent) -> Dict[str, Tuple]:
         """
             loads artist database from already created song database. Magic!!!
         
@@ -207,16 +194,16 @@ class DatasetToDatabase():
 
         artist_stats_dict = {}
 
-        for song_uri, (song_name, artist_name, artist_uri, total_listens, weighted_listens, time_s_listened) in song_database.items():
+        for song_uri, (song_name, artist_name, artist_uri, total_listens, weighted_listens, time_s_listened) in tqdm(song_database.items(), desc="Processing song stats into artist stats."):
             if artist_uri not in artist_stats_dict:
-                new_artist = (artist_name, 0, 0, 0)
+                new_artist = [artist_name, 0, 0, 0]
                 artist_stats_dict[artist_uri] = new_artist
             artist_stats_dict[artist_uri][1] += total_listens
             artist_stats_dict[artist_uri][2] += weighted_listens
             artist_stats_dict[artist_uri][3] += time_s_listened
         return artist_stats_dict
         
-    def extract_dataset_song_stats(self, load_percent=0.5, json_parse="fast") -> Dict[str, Tuple]:
+    def extract_dataset_song_stats(self, load_percent=0.5) -> Dict[str, List]:
         """
             Creates a list of song_stats (unordered)
             returns dict of song info as 
@@ -230,16 +217,16 @@ class DatasetToDatabase():
 
         num_playlists = int(load_percent * 1_000_000) # how many playlists to parse out of 1M
         # first, load every artist in every playlist
-        data_dir = os.path.join(self.database_path, 'data')
+        data_dir = os.path.join(self.dataset_path, 'data')
         endslice: int = num_playlists // 1000
         slices: List[str] = os.listdir(data_dir)
         songs_dict: Dict[str, md.Song_Stat] = {} # song_uri: song_stat dataclass
-        slice_range = tqdm(range(endslice + 1), disable=not self.profile)
+        slice_range = tqdm(range(endslice + 1), disable=not self.profile, desc="Processing songs into songstats.")
 
         for i in slice_range:
             cur_slice = slices[i]
             cur_slice_path = os.path.join(data_dir, cur_slice)
-            playlists: List[Tuple[int, List[md.Song]]] = DatasetJsonLoader.load_slice(cur_slice_path, json_parse)
+            playlists: List[Tuple[int, List[md.Song]]] = DatasetJsonLoader.load_slice(cur_slice_path)
 
             for j, (followers, playlist) in enumerate(playlists):
                 if i == endslice and j == num_playlists % 1000:

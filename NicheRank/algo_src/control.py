@@ -17,7 +17,7 @@ import itertools
 """
 
 DATABASE_DIR = "NicheRank/database"
-DEFAULT_DATABASE = "database_10000.json"
+DEFAULT_DATABASE = "default_db_100000" # by default use the 100_000 songs database
 
 EXAMPLE_USERS_DIR = "NicheRank/algo_src/example_user_history"
 DEFAULT_EXAMPLE_USER = ""
@@ -98,8 +98,8 @@ def test_fake_user_gen_examples():
 
 def large_user_test():
 
-    get_metrics_fake_user(history_size=100000, pop_level="med", gen_type="greedy", sorting_type="q")
-    get_metrics_fake_user(history_size=100000, pop_level="low", gen_type="greedy", sorting_type="m")
+    m1 = get_metrics_fake_user(history_size=100000, pop_level="med", gen_type="greedy", sorting_type="q")
+    m2 = get_metrics_fake_user(history_size=100000, pop_level="low", gen_type="greedy", sorting_type="m")
 
 
 def main():

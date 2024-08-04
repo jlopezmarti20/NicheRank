@@ -59,13 +59,10 @@ class Stat:
 
 # stores stats about an artist
 class Artist_Stat(Stat):
-    artist:Artist = None
-    total_s: int = None
-    total_songs: int = None
-    weighted_listens: int = None # summation of each listen multiplied by the followers of that song artist
 
-    def __init__(self, artist:Artist, uri: str, total_listens: int, weighted_listens: int):
+    def __init__(self, artist:Artist, total_listens: int, weighted_listens: int):
         super().__init__(total_listens, weighted_listens)
+        self.artist = artist
 
     @property
     def popularity(self)->float:
@@ -87,16 +84,12 @@ class Artist_Stat(Stat):
         # Create a new Artist_Stat with combined values
         return Artist_Stat(
             artist=self.artist,
-            total_s=self.total_s + other.total_s,
             total_songs=self.total_songs + other.total_songs,
             weighted_listens=self.weighted_listens + other.weighted_listens
         )
 
 # songstats about a song from how it has been listened to.
 class Song_Stat(Stat):
-    song:Song
-    total_listens:int
-    weighted_listens:int # playlists with higher followers give this more
 
     def __init__(self, song:Song, total_listens: int = None, weighted_listens: int = None):
         super().__init__(total_listens, weighted_listens)
@@ -123,69 +116,6 @@ class Song_Stat(Stat):
             total_listens=self.total_listens + other.total_listens,
             weighted_listens=self.weighted_listens + other.weighted_listens,
         )
-
-def convert_dict_to_music(json_dict):
-    # converts a dict representation of a artist, song or stat into that object
-    
-    if "artists" in json_dict:
-        # this is a song 
-        song = Song(name=json_dict["name"],
-                       uri=json_dict["uri"],
-                       duration_s=json_dict["duration_s"])
-        for artist in json_dict["artists"]:
-            song.artists.append(convert_dict_to_music(artist))
-        return song
-
-    elif "artist" in json_dict:
-        # this is an artist_stat
-        return Artist_Stat(artist=convert_dict_to_music(json_dict["artist"]),
-                              total_s=json_dict["total_s"],
-                              total_songs=json_dict["total_songs"] ,
-                              weighted_listens=json_dict["weighted_listens"])
-    
-    elif "song" in json_dict:
-        # this is a song_stat
-        return Song_Stat(song=convert_dict_to_music(json_dict["song"]),
-                            total_listens=json_dict["total_listens"],
-                            weighted_listens=json_dict["weighted_listens"])
-    
-    elif len(json_dict) == 2:
-        # this is a artist 
-        return Artist(name=json_dict["name"], uri=json_dict["uri"])
-
-
-def convert_music_to_dict(music)-> dict:
-    # encodes a music object as a dictionary for storage
-    if isinstance(music, Song_Stat):
-        return {
-            'song': convert_music_to_dict(music.song),
-            'total_listens': music.total_listens,
-            'weighted_listens': music.weighted_listens
-        }
-    
-    elif isinstance(music, Artist_Stat):
-
-        return {
-            'artist':convert_music_to_dict(music.artist),
-            'total_s': music.total_s,
-            'total_songs': music.total_songs,
-            'weighted_listens': music.weighted_listens
-        }
-        
-    elif isinstance(music, Song):
-        return {
-            'name': music.name,
-            'uri': music.uri,
-            'artists': [convert_music_to_dict(artist) for artist in music.artists],
-            'duration_s': music.duration_s
-        }
-
-    elif isinstance(music, Artist):
-        return asdict(music)
-    
-    else:
-        return None
-
 
 """
     The stats extractor takes a list of songs and extracts its
