@@ -106,9 +106,9 @@ class UserManager():
             Sorter.quicksort(choices)
 
             if pop_level == "a":
-                c_idx = local_size - 1 # size of greedy algorithm view size
+                c_idx = local_size//2 + int(local_size*0.1) # size of greedy algorithm view size
             elif pop_level == "b":
-                c_idx = local_size // 2 
+                c_idx = int(local_size*0.2)
             elif pop_level == "c":
                 c_idx = 0
 
