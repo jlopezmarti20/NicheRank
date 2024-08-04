@@ -127,7 +127,7 @@ export default class Score extends Component {
                 fontSize: "2.5rem",
               }}
             >
-              Obscurity Score: {obscurityScore}%
+              Popularity Score: {obscurityScore}%
             </Typography>
           </Grid>
           <Grid
