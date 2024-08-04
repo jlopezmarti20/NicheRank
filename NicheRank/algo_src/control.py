@@ -14,27 +14,25 @@ import itertools
     to produce final results.
 """
 
-DATABASE_DIR = "NicheRank/algo_src/database"
-DEFAULT_DATABASE = "database_10000.json"
+DATABASE_DIR = "NicheRank/database"
+DEFAULT_DATABASE = "default_db_10000" # by default use the 100_000 songs database
 
-EXAMPLE_USERS_DIR = "NicheRank/algo_src/example_user_history"
-DEFAULT_EXAMPLE_USER = ""
+EXAMPLE_USERS_DIR = "NicheRank/example_users"
 
 
 def test_generate_history():
 
     manager = UserManager()
-    user:str = manager.generate_user_history(size=40, pop_level="med", gen_type="greedy")
+    user:str = manager.generate_user_history(size=40, pop_level="med")
     songs = manager.get_user_songs(user)
 
 def get_metrics_fake_user(history_size, database_name=DEFAULT_DATABASE, pop_level="med", 
-                          gen_type="greedy", sorting_type="q") -> User_Metrics:
+                          sorting_type="q") -> User_Metrics:
     """
         Generate a fake user profile and then runs metric algorithm on that
         history_size: number of listens for history
         database_name: name of the database to use (for if user generated their own)
         pop_level: either low, med, or high for what to use for popularity
-        gen_type: which algorithm to use for the playlist generation
         sorting_type: which sorting algorithm to use in metrics. q for quicksort, m for mergesort
     """
 
@@ -44,7 +42,7 @@ def get_metrics_fake_user(history_size, database_name=DEFAULT_DATABASE, pop_leve
 
     # generate user and username
     user_manager = UserManager(database)
-    user_name = user_manager.generate_user_history(size=history_size, pop_level=pop_level, gen_type=gen_type)
+    user_name = user_manager.generate_user_history(size=history_size, pop_level=pop_level)
     
     # parse in the spotify history
     json_history_path = os.path.join(EXAMPLE_USERS_DIR, user_name)
@@ -81,14 +79,13 @@ def get_metrics_spotify_user(history, database_name=DEFAULT_DATABASE,
 def test_fake_user_gen_examples():
     size_choices = [100, 1000, 100000]
     pop_levels = ["low", "med", "high"]
-    gen_types = ["greedy"]
     sorts = ["q", "m"]
-    test_combinations = itertools.product(size_choices, pop_levels, gen_types, sorts)
+    test_combinations = itertools.product(size_choices, pop_levels, sorts)
     resulting_metrics = []
     print("Testing creation of fake users")
-    for size, pop_level, gen_type, s in test_combinations:
-        print(f"testing {size} {pop_level} {gen_type} {s}")
-        metric = get_metrics_fake_user(history_size=size, pop_level=pop_level, gen_type=gen_type, sorting_type=s)    
+    for size, pop_level, s in test_combinations:
+        print(f"testing {size} {pop_level} {s}")
+        metric = get_metrics_fake_user(history_size=size, pop_level=pop_level, sorting_type=s)    
         resulting_metrics.append(metric)
         print(f"finished\n")
     
@@ -96,8 +93,8 @@ def test_fake_user_gen_examples():
 
 def large_user_test():
 
-    get_metrics_fake_user(history_size=100000, pop_level="med", gen_type="greedy", sorting_type="q")
-    get_metrics_fake_user(history_size=100000, pop_level="low", gen_type="greedy", sorting_type="m")
+    m1 = get_metrics_fake_user(history_size=100000, pop_level="med", sorting_type="q")
+    m2 = get_metrics_fake_user(history_size=100000, pop_level="low", sorting_type="m")
 
 
 def main():

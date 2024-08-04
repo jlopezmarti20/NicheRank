@@ -17,6 +17,15 @@ app = Flask(__name__)
 CORS(app)
 app.config['SECRET_KEY'] = os.urandom(64)
 
+config_dict = {
+    "sorting_type": "m", # m for mergesort, q for quicksort
+    "database_name": "", # name of database directory to use
+    "use_spotify" : True, # whether to use a spotify login, or generate a user
+    "gen_user": {
+        "history_size": 100_000, # size of user history
+        "pop_level": "low" # how popular the user is from low, medium or high
+    }
+}
 
 #this is connecting the Spotify for Developers (SfD) with my project- the client ID and Secret are what connects them
 client_id = '52500f70b3534d0bae16a8efac5a70af'
@@ -29,7 +38,7 @@ scope = 'user-read-recently-played'
 #CHANGE THIS OPTION FOR DIFFERENT USERS.
 # 0 is spotify login. (spotify accounts need to be authenticated in SfD) login with user: Amanda Brannon pw: Workingonit1!
 # 1,2,3 are differently generated users with 100000 points of data
-user_option = 0
+user_option = 1
 
 #this makes a new session upon opening the page- this is important as the authorization token is only temporary
 cache_handler = FlaskSessionCacheHandler(session)
@@ -115,7 +124,7 @@ def user_metrics():
 
         return jsonify(response)
     elif (user_option == 1):
-        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="med", gen_type="greedy", sorting_type="q")
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="med", sorting_type="q")
         artist_list = metrics.artist_metrics.favorites
         song_list = metrics.song_metrics.favorites
         pop_score = metrics.pop_score
@@ -127,7 +136,7 @@ def user_metrics():
 
         return jsonify(response)
     elif (user_option == 2):
-        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="low", gen_type="greedy", sorting_type="m")
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="low", sorting_type="m")
         artist_list = metrics.artist_metrics.favorites
         song_list = metrics.song_metrics.favorites
         pop_score = metrics.pop_score
@@ -139,7 +148,7 @@ def user_metrics():
 
         return jsonify(response)
     elif(user_option == 3):
-        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="high", gen_type="greedy", sorting_type="q")
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="high", sorting_type="q")
         artist_list = metrics.artist_metrics.favorites
         song_list = metrics.song_metrics.favorites
         pop_score = metrics.pop_score
