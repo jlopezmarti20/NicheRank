@@ -5,44 +5,77 @@ from typing import List, Dict
     Music stores classes for artists, songs, 
     songstats and artiststats. 
 """
+ 
+class Music:
+    
+    def __init__(self, uri:str = None) -> None:
+        self.uri:str = self.set_uri(uri) 
+
+    def set_uri(self, uri) -> str:
+        return uri.rsplit(":", 1)[-1] 
+
+    def get_uri(self):
+        return self.uri
+    
+    def __eq__(self, other: object) -> bool:
+        return self.uri == other.uri
 
 # Stores a artists name and uri, checks if artists are equal
-@dataclass
-class Artist:
+class Artist(Music):
     name:str = None
     uri:str = None
 
-    def __eq__(self, other: object) -> bool:
-        if self.uri == other.uri:
-            return True
-        else:
-            return False
+    def  __init__(self, name:str = None, uri: str = None) -> None:
+        super().__init__(uri)
+        self.name = name
 
-# Stores a songs name, uri, song_length, and artists song is by.
-@dataclass 
-class Song:
-    name:str = None
-    uri:str = None
-    artists: List[Artist] = field(default_factory=list)
-    duration_s: int = None 
 
-    def __eq__(self, other: object) -> bool:
-        if self.uri == other.uri:
-            return True
-        else:
-            return False
+class Song(Music):
+    def __init__(self, name: str = None, uri: str = None, artists:List[Artist]=None, duration_s: int = None):
+        super().__init__(uri)
+        self.name = name
+        self.artists = artists if artists is not None else []
+        self.duration_s = int(duration_s)
+
+class Stat:
+    def __init__(self, total_listens: int = None, weighted_listens: int = None):
+        self.total_listens = total_listens
+        self.weighted_listens = weighted_listens
+
+    @property
+    def popularity(self) -> float:
+        raise NotImplementedError("Subclasses should implement this method")
+
+    def get_uri(self):
+        raise NotImplementedError("Subclasses should implement this method")
+
+    def __add__(self, other):
+        raise NotImplementedError("Subclasses should implement this method")
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Stat):
+            return NotImplemented
+        return self.get_uri() == other.get_uri()
 
 # stores stats about an artist
-@dataclass
-class Artist_Stat:
+class Artist_Stat(Stat):
     artist:Artist = None
     total_s: int = None
     total_songs: int = None
     weighted_listens: int = None # summation of each listen multiplied by the followers of that song artist
 
+    def __init__(self, artist:Artist, uri: str, total_listens: int, weighted_listens: int):
+        super().__init__(total_listens, weighted_listens)
+
     @property
     def popularity(self)->float:
-        return calculate_artist_popularity(self)
+        # simple popularity metric for how much an artist has been listened to.
+
+        a = 0.05
+        weighted_score = self.weighted_listens*a
+        unweighted_score = self.total_songs
+
+        return weighted_score + unweighted_score
 
     def get_uri(self):
         return self.artist.uri
@@ -58,24 +91,25 @@ class Artist_Stat:
             total_songs=self.total_songs + other.total_songs,
             weighted_listens=self.weighted_listens + other.weighted_listens
         )
-    
-    def __eq__(self, other) -> bool:
-        if self.artist == other.artist:
-            return True
-        else:
-            return False
 
 # songstats about a song from how it has been listened to.
-@dataclass
-class Song_Stat:
+class Song_Stat(Stat):
     song:Song
     total_listens:int
     weighted_listens:int # playlists with higher followers give this more
-    
+
+    def __init__(self, song:Song, total_listens: int = None, weighted_listens: int = None):
+        super().__init__(total_listens, weighted_listens)
+        self.song = song
+
     @property
     def popularity(self)->float:
-        return calculate_song_popularity(self)
-    
+        # simple metric for a songs listening time
+        a = 0.05
+        weighted_score = self.weighted_listens*a
+        unweighted_score = self.total_listens
+        return weighted_score + unweighted_score
+        
     def get_uri(self):
         return self.song.uri
     
@@ -89,27 +123,6 @@ class Song_Stat:
             total_listens=self.total_listens + other.total_listens,
             weighted_listens=self.weighted_listens + other.weighted_listens,
         )
-    def __eq__(self, other: object) -> bool:
-        if self.song == other.song:
-            return True
-        else:
-            return False        
-
-def calculate_artist_popularity(artist_stat:Artist_Stat):
-    # simple popularity metric for how much an artist has been listened to.
-
-    a = 0.05
-    weighted_score = artist_stat.weighted_listens*a
-    unweighted_score = artist_stat.total_songs
-
-    return weighted_score + unweighted_score
-
-def calculate_song_popularity(song_stat:Song_Stat):
-    # simple metric for a songs listening time
-    a = 0.05
-    weighted_score = song_stat.weighted_listens*a
-    unweighted_score = song_stat.total_listens
-    return weighted_score + unweighted_score
 
 def convert_dict_to_music(json_dict):
     # converts a dict representation of a artist, song or stat into that object
@@ -212,13 +225,13 @@ class Stats_Extractor():
             song_stats_dict[song.uri].weighted_listens += followers
 
 
-    def optimized_extract_songstats(playlist:List[Song], optimized_songs_dict: Dict[str, tuple], followers=1):
+    def optimized_extract_songstats(playlist:List[Song], optimized_songs_dict: Dict[str, List], followers=1):
         # optimized extracts songstats from playlist
         # {song_uri: (songname, artist_name, artist_uri, artist_name, total_listens, weighted_listens, time_listened)}
         
         for song in playlist:
             if song.uri not in optimized_songs_dict:
-                song_stat = (song.name, song.artists[0].name, song.artists[0].get_uri(), 0, 0, 0)
+                song_stat = [song.name, song.artists[0].name, song.artists[0].get_uri(), 0, 0, 0]
                 optimized_songs_dict[song.uri] = song_stat 
             optimized_songs_dict[song.uri][3] += 1 # total listens
             optimized_songs_dict[song.uri][4] += followers # weighted listens
