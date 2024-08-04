@@ -13,7 +13,7 @@ import NicheRank.algo_src.music as md
 """
 
 class UserManager():
-
+    #WAHOOOo
     def __init__(self, database=None) -> None:
         # database is what music database we are pulling from
 
