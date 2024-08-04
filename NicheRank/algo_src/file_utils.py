@@ -1,5 +1,5 @@
 import json
-from typing import List, Tuple, Dict, Union
+from typing import List, Tuple, Dict
 import os
 from tqdm import tqdm
 import sys
@@ -32,18 +32,18 @@ def deserialize_database(database_path)->Dict[Dict[str, md.Artist_Stat], Dict[st
     return {"artist_stats": artist_dict,
             "song_stats": songs_dict}
 
-def convert_list_to_stat(tup: Tuple):
+def convert_list_to_stat(tup: Tuple)-> md.Stat:
     """
         Converts a Stat Tuple into a Stat Object
         Artist: [artist_uri, name, total_listens, weighted_l]
     """
 
-    if len(tup) == 5:
+    if len(tup) == 4:
         artist = md.Artist_Stat(artist=md.Artist(tup[1], tup[0]),
                                 weighted_listens=tup[3],
                                 total_listens=tup[2])
         return artist
-    elif len(tup) == 7:
+    elif len(tup) == 6:
         # [song_uri, name, artist_uri_compressed, artist_name, total_listens, weighted_listen]
         song = md.Song_Stat(
             song=md.Song(
@@ -52,7 +52,7 @@ def convert_list_to_stat(tup: Tuple):
                     artists=[md.Artist(uri=tup[3], name=tup[2])],
                 ),
                 total_listens=tup[4],
-                weighted_listens=[5]
+                weighted_listens=tup[5]
                 )
         return song
 
@@ -83,7 +83,7 @@ def parse_spotify_history_json(response)->List[md.Song]:
         artists_list: List[md.Artist] = []
         for artist in artists:
             artists_list.append(md.Artist(name=artist["name"], uri=artist["uri"]))
-        song = md.Song(name=track["name"],uri=track["uri"], artists=artists_list, duration_s=track["duration_ms"] / 60)
+        song = md.Song(name=track["name"],uri=track["uri"], artists=artists_list)
         recently_played.append(song) 
 
     return recently_played
@@ -98,7 +98,6 @@ def create_spotify_response(songs: List[md.Song]) -> dict:
                 "name": song.name,
                 "uri": song.uri,
                 "artists": [{"name": artist.name, "uri": artist.uri} for artist in song.artists],
-                "duration_ms": int(song.duration_s * 60 * 1000)  # converting back to milliseconds
             }
         }
         response_items.append(track)
@@ -129,7 +128,6 @@ class DatasetJsonLoader:
                         name=track["track_name"],
                         uri=track["track_uri"],
                         artists=[md.Artist(name=track["artist_name"], uri=track["artist_uri"])],
-                        duration_s=track["duration_ms"] / 1000  # Corrected conversion to seconds
                     )
                     for track in playlist["tracks"]
                 ]
@@ -187,27 +185,26 @@ class DatasetToDatabase():
 
     def extract_artiststats_from_song_database(self, song_database:Dict[str, List], load_percent) -> Dict[str, Tuple]:
         """
-            loads artist database from already created song database. Magic!!!
-        
+            loads artist database from already created song database. 
             returns: {artist_uri:(name, total_listens, weighted_l, sec_l)}
         """
 
         artist_stats_dict = {}
 
-        for song_uri, (song_name, artist_name, artist_uri, total_listens, weighted_listens, time_s_listened) in tqdm(song_database.items(), desc="Processing song stats into artist stats."):
+        for song_uri, (song_name, artist_name, artist_uri, total_listens, weighted_listens) in tqdm(song_database.items(), desc="Processing song stats into artist stats."):
             if artist_uri not in artist_stats_dict:
-                new_artist = [artist_name, 0, 0, 0]
+                new_artist = [artist_name, 0, 0]
                 artist_stats_dict[artist_uri] = new_artist
             artist_stats_dict[artist_uri][1] += total_listens
             artist_stats_dict[artist_uri][2] += weighted_listens
-            artist_stats_dict[artist_uri][3] += time_s_listened
+            
         return artist_stats_dict
         
     def extract_dataset_song_stats(self, load_percent=0.5) -> Dict[str, List]:
         """
             Creates a list of song_stats (unordered)
             returns dict of song info as 
-            {str: (name, artist_uri_compressed, total_listens, weighted_listen, seconds_listened)}
+            {str: (name, artist_uri, artist_name, total_listens, weighted_listens)}
         
         """
         if (load_percent < 0.0 or load_percent > 1.0):

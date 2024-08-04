@@ -109,7 +109,7 @@ class Sorter():
         return sorted        
 
     # behavior
-    def merge_slow(left: List, right: List) -> List[Union[md.Song_Stat, md.Artist_Stat]]:
+    def merge_slow(left: List, right: List) -> List[md.Stat]:
             
             """
                 This merge method is slow as it appends to the list continuously, possibly resizing it in O(N) time.
@@ -183,7 +183,7 @@ class Sorter():
 class StatSorter(Sorter):
     
     @staticmethod
-    def merge_sort_stats(stats_list: List[Union[md.Song_Stat, md.Artist_Stat]]) -> List[Union[md.Song_Stat, md.Artist_Stat]]:
+    def merge_sort_stats(stats_list: List[md.Stat]) -> List[md.Stat]:
         """
             Quicksorts a list of either ArtistStats or SongStats
         """
@@ -192,7 +192,7 @@ class StatSorter(Sorter):
         music_list = StatSorter.recreate_music_list(sorted_tuple, stats_list)
         return music_list
     @staticmethod
-    def quicksort_stats(stats_list:List[Union[md.Song_Stat, md.Artist_Stat]]):
+    def quicksort_stats(stats_list:List[md.Stat]):
         """
             Quicksort should be faster then mergesort, as we dont need to keep constructing lists over and 
             over again. However, to avoid deletions and array creation, we will need to fuse all repeats as the
@@ -205,7 +205,7 @@ class StatSorter(Sorter):
         return music_list
 
     @staticmethod    
-    def recreate_music_list(sorted_list, stats_list: List[Union[md.Song_Stat, md.Artist_Stat]])-> List[Union[md.Song_Stat, md.Artist_Stat]]:
+    def recreate_music_list(sorted_list, stats_list: List[md.Stat])-> List[md.Stat]:
         uri_map = {stat.get_uri(): stat for stat in stats_list}
         new_list = [(None, None)] * len(sorted_list)
         for i in range(len(sorted_list)):
@@ -222,7 +222,7 @@ class StatSorter(Sorter):
 class GlobalSorter(Sorter):
 
     @staticmethod
-    def merge_sort_stats(stats_list: List[Union[md.Song_Stat, md.Artist_Stat]], global_music_dict) -> List[Union[md.Song_Stat, md.Artist_Stat]]:
+    def merge_sort_stats(stats_list: List[md.Stat], global_music_dict) -> List[md.Stat]:
         # Merge Sort Stats runs merge sort with the global_music_dict in O(NLogN), HOWEVER
         # its main slowdown occurs when it keeps recreating the list in the merge operation. 
         stats_as_tuple = []
@@ -239,7 +239,7 @@ class GlobalSorter(Sorter):
         return music_list
     
     @staticmethod
-    def quicksort_stats(stats_list:List[Union[md.Song_Stat, md.Artist_Stat]], global_music_dict):
+    def quicksort_stats(stats_list:List[md.Stat], global_music_dict):
         """
             Quicksort should be faster then mergesort, as we dont need to keep constructing lists over and 
             over again. However, to avoid deletions and array creation, we will need to fuse all repeats as the
@@ -259,7 +259,7 @@ class GlobalSorter(Sorter):
         return music_list
 
     @staticmethod    
-    def recreate_music_list(sorted_list, stats_list)-> List[Union[md.Song_Stat, md.Artist_Stat]]:
+    def recreate_music_list(sorted_list, stats_list)-> List[md.Stat]:
         # from the sorted tuple list, recreates the stats list using a hashmap O(LenSortedList)
         stats_map = {stat.get_uri(): stat for stat in stats_list}
 

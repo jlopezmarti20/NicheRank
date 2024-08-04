@@ -13,7 +13,7 @@ import music as md
 """
 
 class UserManager():
-    #WAHOOOo
+
     def __init__(self, database=None) -> None:
         # database is what music database we are pulling from
 
@@ -91,8 +91,7 @@ class UserManager():
             pop_level: low, med, or high. This reflects the listening habits of the user
             size: number of songs in playlist
         """
-        num_choices = 5
-        unknown_song_add = 0.1 # add a random unknown song to list
+        local_size = 10 # size of greedy algorithm view size
 
         spontiniety = random.uniform(0.4, 1)  # how likely you are to listen to a bunch of songs
         max_times_listened = 20
@@ -103,7 +102,6 @@ class UserManager():
         stats_normed:List[Tuple[str, float]] = UserManager.normalize_pop_list(stats_list)
 
         i = 0
-        local_size = 10
         history:List[str] = [None] * size
 
         while (i < size):

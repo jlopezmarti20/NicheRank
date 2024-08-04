@@ -31,11 +31,10 @@ class Artist(Music):
 
 
 class Song(Music):
-    def __init__(self, name: str = None, uri: str = None, artists:List[Artist]=None, duration_s: int = None):
+    def __init__(self, name: str = None, uri: str = None, artists:List[Artist]=None):
         super().__init__(uri)
         self.name = name
         self.artists = artists if artists is not None else []
-        self.duration_s = int(duration_s)
 
 class Stat:
     def __init__(self, total_listens: int = None, weighted_listens: int = None):
@@ -70,7 +69,7 @@ class Artist_Stat(Stat):
 
         a = 0.05
         weighted_score = self.weighted_listens*a
-        unweighted_score = self.total_songs
+        unweighted_score = self.total_listens
 
         return weighted_score + unweighted_score
 
@@ -84,7 +83,7 @@ class Artist_Stat(Stat):
         # Create a new Artist_Stat with combined values
         return Artist_Stat(
             artist=self.artist,
-            total_songs=self.total_songs + other.total_songs,
+            total_songs=self.total_listens + other.total_listens,
             weighted_listens=self.weighted_listens + other.weighted_listens
         )
 
@@ -135,10 +134,9 @@ class Stats_Extractor():
         for song in songs:
             for artist in song.artists:
                 if artist.uri not in artist_stats_dict:
-                    artist_stats_dict[artist.uri] = Artist_Stat(artist=artist, total_s=0, total_songs=0, weighted_listens=0)
-                artist_stats_dict[artist.uri].total_s += song.duration_s
+                    artist_stats_dict[artist.uri] = Artist_Stat(artist=artist, total_listens=0, weighted_listens=0)
                 artist_stats_dict[artist.uri].weighted_listens += followers
-                artist_stats_dict[artist.uri].total_songs += 1
+                artist_stats_dict[artist.uri].total_listens += 1
 
     def extract_song_stats_from_songs(songs: List[Song]) -> List[Song_Stat]:
         SS_dict = {}
@@ -157,14 +155,13 @@ class Stats_Extractor():
 
     def optimized_extract_songstats(playlist:List[Song], optimized_songs_dict: Dict[str, List], followers=1):
         # optimized extracts songstats from playlist
-        # {song_uri: (songname, artist_name, artist_uri, artist_name, total_listens, weighted_listens, time_listened)}
+        # {song_uri: [name, artist_uri, artist_name, total_listens, weighted_listens]}
         
         for song in playlist:
             if song.uri not in optimized_songs_dict:
-                song_stat = [song.name, song.artists[0].name, song.artists[0].get_uri(), 0, 0, 0]
+                song_stat = [song.name, song.artists[0].name, song.artists[0].get_uri(), 0, 0]
                 optimized_songs_dict[song.uri] = song_stat 
             optimized_songs_dict[song.uri][3] += 1 # total listens
             optimized_songs_dict[song.uri][4] += followers # weighted listens
-            optimized_songs_dict[song.uri][5] += song.duration_s # time listened
 
         pass
