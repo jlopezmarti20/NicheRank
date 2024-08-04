@@ -54,7 +54,6 @@ class UserManager():
 
         return save_name
 
-
     def get_user_songs(self, name) -> List[md.Song]:
         # selects a user from example user history
         name = name + ".json" if ".json" not in name else name
@@ -91,8 +90,7 @@ class UserManager():
             pop_level: low, med, or high. This reflects the listening habits of the user
             size: number of songs in playlist
         """
-        num_choices = 5
-        unknown_song_add = 0.1 # add a random unknown song to list
+        unknown_song_add = 0.05 # add a random unknown song to list
 
         spontiniety = random.uniform(0.4, 1)  # how likely you are to listen to a bunch of songs
         max_times_listened = 20
@@ -103,7 +101,7 @@ class UserManager():
         stats_normed:List[Tuple[str, float]] = UserManager.normalize_pop_list(stats_list)
 
         i = 0
-        local_size = 10
+        local_size = 7
         history:List[str] = [None] * size
 
         while (i < size):
@@ -114,18 +112,24 @@ class UserManager():
             # we now want the small, medium, or large 
             # choose the smallest, medium or large value by using a heap 
             Sorter.quicksort(choices)
-            if pop_level == "low":
-                choose_idx = local_size - 1
-            elif pop_level == "med":
-                choose_idx = local_size//2
-            elif pop_level == "high":
-                choose_idx = 0
-
+            if random.uniform(0,1) < unknown_song_add:
+                # add a unknown song to mix
+                # TODO make this
+                new_song = UserManager.gen_random_song()
+            else:    
+                # dont add a random song
+                if pop_level == "low":
+                    choose_idx = local_size - 1
+                elif pop_level == "med":
+                    choose_idx = local_size//2
+                elif pop_level == "high":
+                    choose_idx = 0
+                new_song = choices[choose_idx] 
             # add this song this many times!
             times_listened = int(random.randint(0, max_times_listened) * spontiniety)
             j = 0
             while (j < times_listened and i < size):
-                history[i] = choices[choose_idx]
+                history[i] = new_song
                 j += 1
                 i += 1
 

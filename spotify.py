@@ -59,12 +59,19 @@ def get_recently_played():
 
     #gets only uris in a list, not formatted
     
+    metrics = ctrl.get_metrics_spotify_user(data)
+    metrics_name = "current_metrics.json"
+    save_metrics_into_json(metrics, metrics_name)
+
+    """
     file_path = "user_history.json"
     with open(file_path, "w") as f:
         json.dump(data, f)
-    
+    """
+
     redirect_uri = 'http://127.0.0.1:8000/Score'
     return redirect(redirect_uri)
+    
 
 @app.route('/logout')
 def logout():
