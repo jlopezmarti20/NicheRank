@@ -32,7 +32,7 @@ class UserManager():
         self.database_song_stats = database["song_stats"]
         self.users_dir = DEFAULT_USERS_DIR
 
-    def generate_user_history(self, size, pop_level="med", name=None, gen_type="greedy") -> str:
+    def generate_user_history(self, size, pop_level="med", name=None) -> str:
         """
             Creates a user and saved them in example_user_history
 
@@ -40,12 +40,10 @@ class UserManager():
         """
 
         song_history: List[md.Song] = []
-        if gen_type == "greedy":
-            song_history = self.greedy_generate_history(size=size, pop_level=pop_level)
-        elif gen_type == "heap":
-            song_history = self.heap_generate_history(size=size, pop_level=pop_level)
 
-        save_name = name if name != None else f"user_{pop_level}_{size}_{gen_type}"
+        song_history = self.greedy_generate_history(size=size, pop_level=pop_level)
+
+        save_name = name if name != None else f"user_{pop_level}_{size}"
         save_name = save_name + ".json" if ".json" not in save_name else save_name
 
         # save this history like its a spotify response        
@@ -79,13 +77,6 @@ class UserManager():
         for user in os.listdir(self.users_dir):
             os.remove(os.path.join(self.users_dir, user))
 
-
-    def heap_generate_history(self, size:int, pop_level="med"):
-        """
-            Each song has artists it is made by 
-        """
-        
-        pass
 
     def greedy_generate_history(self, size:int = 10000, pop_level="med"):
         """
