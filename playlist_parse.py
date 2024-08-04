@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from NicheRank.algo_src.file_management import Dataset_Extractor
+from NicheRank.algo_src.file_utils import Dataset_Extractor
 
 """
     This script is for Generating Your Own database from the Playlist Dataset. 

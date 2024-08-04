@@ -3,7 +3,7 @@ import random
 import os
 import json
 
-from file_management import deserialize_database, parse_spotify_history_json, create_spotify_response
+from file_utils import deserialize_database, parse_spotify_history_json, create_spotify_response
 from sorting import Sorter
 import NicheRank.algo_src.music as md
 

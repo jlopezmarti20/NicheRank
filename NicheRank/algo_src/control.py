@@ -1,5 +1,5 @@
-import file_management as fm
-import NicheRank.algo_src.music as md
+import file_utils as fm
+import music as md
 from analyze_history import HistoryAnalyzer, User_Metrics
 from users import UserManager
 import itertools
