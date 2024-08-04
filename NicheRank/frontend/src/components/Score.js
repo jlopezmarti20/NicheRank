@@ -137,7 +137,7 @@ export default class Score extends Component {
                 fontSize: "2.5rem",
               }}
             >
-              Popularity Score: {obscurityScore}%
+              Popularity Score: {popularityScore}%
             </Typography>
           </Grid>
           {/* Grid container for the lists */}
