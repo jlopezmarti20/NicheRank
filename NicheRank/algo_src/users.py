@@ -5,7 +5,7 @@ import json
 
 from file_management import deserialize_database, parse_spotify_history_json, create_spotify_response
 from sorting import Sorter
-import NicheRank.algo_src.music as md
+import music as md
 
 """
     UserManager generates example histories of various popularity 

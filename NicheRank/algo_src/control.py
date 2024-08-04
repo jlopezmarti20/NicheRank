@@ -1,12 +1,11 @@
-import file_management as fm
-import NicheRank.algo_src.music as md
-from analyze_history import HistoryAnalyzer, User_Metrics
-from users import UserManager
 import itertools
-
-
 from typing import List, Dict
 import os
+
+import file_management as fm
+import music as md
+from analyze_history import HistoryAnalyzer, User_Metrics
+from users import UserManager
 
 """
     Control allows all the pieces to come together from the Database, User, and Analytics engine

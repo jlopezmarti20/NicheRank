@@ -1,6 +1,6 @@
 from typing import List, Tuple, Dict, Union, Any
 
-import NicheRank.algo_src.music as md
+import music as md
 
 """
     Sorting class takes a list of (str,float) Tuples and sorts them by ascending order
