@@ -73,7 +73,7 @@ def get_recently_played():
     with open(file_path, "w") as f:
         json.dump(data, f)
 
-    return redirect(url_for('user_metrics'))
+    #return redirect(url_for('user_metrics'))
     redirect_uri = 'http://127.0.0.1:8000/Score'
     return redirect(redirect_uri)
 
@@ -82,8 +82,6 @@ def user_metrics():
     sorting_type = "q" #can be q or m
     history_path = "user_history.json"
     metrics: User_Metrics = ctrl.get_metrics_spotify_user(history=history_path, sorting_type=sorting_type)
-    #Example list of songs: songs = ["Song1", "Song2", "Song3"]
-
     return jsonify(metrics)
 
 #this never happens since we redirect to the frontend :)
@@ -91,10 +89,6 @@ def user_metrics():
 def logout():
     session.clear()
     return redirect(url)
-
-def metrics_to_dict(metrics) -> dict:
-    # turns metrics into a dictionary
-    pass
 
 #the backbone of all python files
 if __name__ == '__main__':
