@@ -1,8 +1,6 @@
 import sys
-
 from typing import List, Dict
 import os
-
 import file_utils as fm
 import music as md
 from analyze_history import HistoryAnalyzer, User_Metrics

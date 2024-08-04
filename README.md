@@ -6,7 +6,8 @@ To use the database, please do the following:
 1. pip -r requirements.txt
 2. Download the json database files and put which one you would like in NicheRank/database
 3. python3 NicheRank/manage.py runserver
-4. 
+4. python spotify.py
+5. To use the Spotify API, leave user_login as 0. You must log in with these credentials, as Spotify for Developers only lets manually authorized users log in on unpublished projects (I would have to add your account to the list). [username: AmandaBrannon pw: Workingonit1!] change user_login to 1, 2, or 3, and it will randomly generate a fake user profile with 100000 points of data, as well as different sorting types (q=quick, m= merge).
 ## Dataset to Database Extraction
 
 Due to the size of the database, we have already created it on our own. If you would like to generate your own database, do the following: 
