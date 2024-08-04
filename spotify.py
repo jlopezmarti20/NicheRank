@@ -28,8 +28,9 @@ scope = 'user-read-recently-played'
 
 #CHANGE THIS OPTION FOR DIFFERENT USERS.
 # 0 is spotify login. (spotify accounts need to be authenticated in SfD) login with user: Amanda Brannon pw: Workingonit1!
-# 1,2,3 are differently generated users with 100000 points of data
-user_option = 1
+# 1 through 7 are differently generated users with 100000 points (or more) of data
+user_option = 0
+
 DEFAULT_DATABASE = 'default_db_100000'
 DATABASE_USED = DEFAULT_DATABASE
 
@@ -116,8 +117,102 @@ def user_metrics():
         }
 
         return jsonify(response)
+    
+
+    #THIS ARE THE FAKE USER PROFILES. YOU CAN CHANGE THE VARIABLES WITHIN get_metrics_fake_user() IF YOU WANT MORE VARIATIONS
+    
     elif (user_option == 1):
-        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="a", sorting_type="q", database_name=DEFAULT_DATABASE)
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="c", sorting_type="q", database_name=DATABASE_USED)
+
+        artist_list = metrics.artist_metrics.favorites
+        song_list = metrics.song_metrics.favorites
+        pop_score=100
+        pop_score = metrics.pop_score
+        print(pop_score)
+        response = {
+            "topArtists": artist_list[:5],
+            "pop_score": pop_score,
+            "topSongs": song_list[:5]
+        }
+
+        return jsonify(response)
+    elif (user_option == 2):
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="b", sorting_type="q", database_name=DATABASE_USED)
+
+        artist_list = metrics.artist_metrics.favorites
+        song_list = metrics.song_metrics.favorites
+        pop_score=100
+        pop_score = metrics.pop_score
+        print(pop_score)
+        response = {
+            "topArtists": artist_list[:5],
+            "pop_score": pop_score,
+            "topSongs": song_list[:5]
+        }
+
+        return jsonify(response)
+    elif (user_option == 3):
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="a", sorting_type="q", database_name=DATABASE_USED)
+
+        artist_list = metrics.artist_metrics.favorites
+        song_list = metrics.song_metrics.favorites
+        pop_score=100
+        pop_score = metrics.pop_score
+        print(pop_score)
+        response = {
+            "topArtists": artist_list[:5],
+            "pop_score": pop_score,
+            "topSongs": song_list[:5]
+        }
+
+        return jsonify(response)
+    elif (user_option == 4):
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="c", sorting_type="m", database_name=DATABASE_USED)
+
+        artist_list = metrics.artist_metrics.favorites
+        song_list = metrics.song_metrics.favorites
+        pop_score=100
+        pop_score = metrics.pop_score
+        print(pop_score)
+        response = {
+            "topArtists": artist_list[:5],
+            "pop_score": pop_score,
+            "topSongs": song_list[:5]
+        }
+
+        return jsonify(response)
+    elif (user_option == 5):
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="b", sorting_type="m", database_name=DATABASE_USED)
+
+        artist_list = metrics.artist_metrics.favorites
+        song_list = metrics.song_metrics.favorites
+        pop_score=100
+        pop_score = metrics.pop_score
+        print(pop_score)
+        response = {
+            "topArtists": artist_list[:5],
+            "pop_score": pop_score,
+            "topSongs": song_list[:5]
+        }
+
+        return jsonify(response)
+    elif (user_option == 6):
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="a", sorting_type="m", database_name=DATABASE_USED)
+
+        artist_list = metrics.artist_metrics.favorites
+        song_list = metrics.song_metrics.favorites
+        pop_score=100
+        pop_score = metrics.pop_score
+        print(pop_score)
+        response = {
+            "topArtists": artist_list[:5],
+            "pop_score": pop_score,
+            "topSongs": song_list[:5]
+        }
+
+        return jsonify(response)
+    elif (user_option == 7):
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=200000, pop_level="c", sorting_type="q", database_name=DATABASE_USED)
 
         artist_list = metrics.artist_metrics.favorites
         song_list = metrics.song_metrics.favorites
