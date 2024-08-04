@@ -105,7 +105,7 @@ class HistoryAnalyzer():
         min_global = min(artist.popularity for uri, artist in self.g_artists_map.items())
         max_global = max(artist.popularity for uri, artist in self.g_artists_map.items()) 
         
-        normalized_artist_stats = {uri: (artist_stat.popularity - min_global)*100/(max_global - min_global) for uri, artist_stat in self.g_artists_map}
+        normalized_artist_stats = {uri: (artist_stat.popularity - min_global)*100/(max_global - min_global) for uri, artist_stat in self.g_artists_map.items()}
         sum_pop_artists = 0
         total_songs_listened = 0
 
