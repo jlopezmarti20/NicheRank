@@ -115,6 +115,7 @@ def calculate_song_popularity(song_stat:Song_Stat):
 
 def convert_dict_to_music(json_dict):
     # converts a dict representation of a artist, song or stat into that object
+    
     if "artists" in json_dict:
         # this is a song 
         song = Song(name=json_dict["name"],

@@ -9,8 +9,8 @@ from typing import List, Dict
 import os
 
 """
-    This meant to explain how this workflow should go. Each method of loading the data
-    can be moldable to however the database works.
+    Control allows all the pieces to come together from the Database, User, and Analytics engine
+    to produce final results.
 """
 
 DATABASE_DIR = "NicheRank/algo_src/database"

@@ -63,7 +63,7 @@ class Sorter():
     def merge_fast(left: List[Tuple[str, float]], right: List[Tuple[str, float]]):
 
         """
-            This merge method is faster as it uses a preallocated list that never needs to be expanded.
+            This merge method is faster as it uses a preallocated list that never needs to be expanded. O(N)
         """
 
         l = 0
@@ -113,6 +113,7 @@ class Sorter():
             
             """
                 This merge method is slow as it appends to the list continuously, possibly resizing it in O(N) time.
+                HOWEVER, because it uses a append operation which can require resizing, it becomes O(N^2).
             """
 
             l = 0
@@ -183,6 +184,9 @@ class StatSorter(Sorter):
     
     @staticmethod
     def merge_sort_stats(stats_list: List[Union[md.Song_Stat, md.Artist_Stat]]) -> List[Union[md.Song_Stat, md.Artist_Stat]]:
+        """
+            Quicksorts a list of either ArtistStats or SongStats
+        """
         stats_as_tuple = [(stat.get_uri(), stat.popularity) for stat in stats_list]
         sorted_tuple = Sorter.merge_sort(stats_as_tuple)
         music_list = StatSorter.recreate_music_list(sorted_tuple, stats_list)
@@ -211,15 +215,16 @@ class StatSorter(Sorter):
         return new_list
 
 """
-    GlobalSorter takes a song_history and a stat database and sorts them based on
-    the popularity of the stat database.
+    GlobalSorter takes a song_history and a stats database and sorts them based on
+    the popularity of the stats database.
 """
 
 class GlobalSorter(Sorter):
 
     @staticmethod
     def merge_sort_stats(stats_list: List[Union[md.Song_Stat, md.Artist_Stat]], global_music_dict) -> List[Union[md.Song_Stat, md.Artist_Stat]]:
-
+        # Merge Sort Stats runs merge sort with the global_music_dict in O(NLogN), HOWEVER
+        # its main slowdown occurs when it keeps recreating the list in the merge operation. 
         stats_as_tuple = []
         for stat in stats_list:
             uri = stat.get_uri()
@@ -255,6 +260,7 @@ class GlobalSorter(Sorter):
 
     @staticmethod    
     def recreate_music_list(sorted_list, stats_list)-> List[Union[md.Song_Stat, md.Artist_Stat]]:
+        # from the sorted tuple list, recreates the stats list using a hashmap O(LenSortedList)
         stats_map = {stat.get_uri(): stat for stat in stats_list}
 
         new_list = [None] * len(sorted_list)
