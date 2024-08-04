@@ -23,7 +23,7 @@ EXAMPLE_USERS_DIR = "NicheRank/example_users"
 def test_generate_history():
 
     manager = UserManager()
-    user:str = manager.generate_user_history(size=40, pop_level="med")
+    user:str = manager.generate_user_history(size=40, pop_level="b")
     songs = manager.get_user_songs(user)
 
 def get_metrics_fake_user(history_size, database_name=DEFAULT_DATABASE, pop_level="med", 
@@ -32,7 +32,7 @@ def get_metrics_fake_user(history_size, database_name=DEFAULT_DATABASE, pop_leve
         Generate a fake user profile and then runs metric algorithm on that
         history_size: number of listens for history
         database_name: name of the database to use (for if user generated their own)
-        pop_level: either low, med, or high for what to use for popularity
+        pop_level: either a,b,c for greedy algorithm choices
         sorting_type: which sorting algorithm to use in metrics. q for quicksort, m for mergesort
     """
 
@@ -78,7 +78,7 @@ def get_metrics_spotify_user(history, database_name=DEFAULT_DATABASE,
 
 def test_fake_user_gen_examples():
     size_choices = [100, 1000, 100000]
-    pop_levels = ["low", "med", "high"]
+    pop_levels = ["a", "b", "c"]
     sorts = ["q", "m"]
     test_combinations = itertools.product(size_choices, pop_levels, sorts)
     resulting_metrics = []
@@ -100,8 +100,8 @@ def test_spotify_history():
 
 def large_user_test():
 
-    m1 = get_metrics_fake_user(history_size=100000, pop_level="med", sorting_type="q")
-    m2 = get_metrics_fake_user(history_size=100000, pop_level="low", sorting_type="m")
+    m1 = get_metrics_fake_user(history_size=100000, pop_level="a", sorting_type="q")
+    m2 = get_metrics_fake_user(history_size=100000, pop_level="b", sorting_type="m")
 
 
 def main():

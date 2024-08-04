@@ -84,13 +84,8 @@ class UserManager():
             pop_level: low, med, or high. This reflects the listening habits of the user
             size: number of songs in playlist
         """
-        if pop_level == "a":
-            local_size = 3 # size of greedy algorithm view size
-        elif pop_level == "b":
-            local_size = 3
-        elif pop_level == "b":
-            local_size = 3
 
+        local_size = 15
         max_times_listened = 10
 
         # grap a bunch of songs, and then choose the one of nth popularity 
@@ -111,25 +106,15 @@ class UserManager():
             Sorter.quicksort(choices)
 
             if pop_level == "a":
-                c_idx = local_size - 1 - random.randint(0, local_size//3)# size of greedy algorithm view size
+                c_idx = local_size - 1 # size of greedy algorithm view size
             elif pop_level == "b":
-                c_idx = local_size // 2
+                c_idx = local_size // 2 
             elif pop_level == "c":
-                c_idx = 0 + random.randint(0, local_size//4)
+                c_idx = 0
 
-            song = choices[c_idx] # choose largest of choices
-            # pop level determines how many times song is added
-            max_times_listened *= (song[1]/100)
-            max_times_listened += random.randint(1, 4)
-            if pop_level == "low" and song[1] < 33:
-                times_listened = 3 * int(random.randint(0, int(max_times_listened)))
-            elif (pop_level == "high" and song[1] > 66):
-                times_listened = 3 * int(random.randint(0, max_times_listened))
-            elif pop_level == "med" and (song[1] > 33 and song[1] < 66):
+            song = choices[c_idx]
+            times_listened = random.randint(0,int(size*0.001) + 30) 
 
-                times_listened = 3 * int(random.randint(0, max_times_listened))
-            else:
-                times_listened = 3
             # add this song this many times!
             j = 0
             while (j < times_listened and i < size):
@@ -137,8 +122,6 @@ class UserManager():
                 j += 1
                 i += 1
 
-        # shuffle these songs
-        UserManager.shuffle(history)
         
         # map the uris back to songs
         songs = [None] * size
@@ -148,10 +131,6 @@ class UserManager():
             songs[i] = song
 
         return songs
-
-    def shuffle(history):
-        # todo maybe inpliment shuffle algorithm
-        return
     
     def normalize_pop_list(pop_list: List[Tuple[str, float]]) -> List[Tuple[str, float]]:
         mi = min(pop for _, pop in pop_list)
