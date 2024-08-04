@@ -72,16 +72,19 @@ def get_recently_played():
     file_path = "user_history.json"
     with open(file_path, "w") as f:
         json.dump(data, f)
-    
+
+    return redirect(url_for('user_metrics'))
     redirect_uri = 'http://127.0.0.1:8000/Score'
     return redirect(redirect_uri)
 
 @app.route('/user_metrics', methods=['GET'])   #http://127.0.0.1:5000/user-metrics
 def user_metrics():
     sorting_type = "q" #can be q or m
-    metrics: User_Metrics = ctrl.get_metrics_spotify_user('user_history.json', database_name=ctrl.DEFAULT_DATABASE, sorting_type=sorting_type)
+    history_path = "user_history.json"
+    metrics: User_Metrics = ctrl.get_metrics_spotify_user(history=history_path, sorting_type=sorting_type)
     #Example list of songs: songs = ["Song1", "Song2", "Song3"]
-    return (metrics)
+    print(metrics)
+    return(None)
 
 #this never happens since we redirect to the frontend :)
 @app.route('/logout')

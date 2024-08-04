@@ -67,6 +67,7 @@ def get_metrics_spotify_user(history, database_name=DEFAULT_DATABASE,
 
         returns: User Metrics object
     """
+
     # generate database 
     database_path = os.path.join(DATABASE_DIR, database_name)
     database = fm.deserialize_database(database_path)
