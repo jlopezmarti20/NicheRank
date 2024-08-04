@@ -6,9 +6,10 @@ export default class Score extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      artist: [],
-      song: [],
+      artists: [],
+      songs: [],
       obscurityScore: 0,
+      error: null,
     };
   }
 
@@ -17,7 +18,8 @@ export default class Score extends Component {
       .then((response) => response.json())
       .then((data) => {
         this.setState({
-          artist: data.topArtists,
+          artists: data.topArtists,
+          songs: data.topSongs,
           obscurityScore: (data.pop_score * 100).toFixed(1),
         });
       })
@@ -28,39 +30,7 @@ export default class Score extends Component {
   }
 
   render() {
-    const { artist, obscurityScore } = this.state;
-    const columns = [];
-
-    for (let i = 0; i < artist.length; i += 5) {
-      const songs = artist.slice(i, i + 5);
-      columns.push(
-        <Grid item xs={4} key={i} style={{ padding: "20px" }}>
-          <Grid container direction="column" spacing={2}>
-            {songs.map((song, index) => (
-              <Box
-                key={index}
-                style={{
-                  backgroundColor: "rgba(223,214,239, 0.3)",
-                  padding: "20px",
-                  marginBottom: "20px",
-                  textAlign: "left",
-                  fontSize: "2.5rem",
-                  color: "white",
-                  fontWeight: "bold",
-                  whiteSpace: "nowrap",
-                  borderRadius: "5px",
-                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                  width: "400px",
-                  height: "45px",
-                }}
-              >
-                {song}
-              </Box>
-            ))}
-          </Grid>
-        </Grid>
-      );
-    }
+    const { artists, songs, obscurityScore, error } = this.state;
 
     return (
       <div
@@ -105,8 +75,8 @@ export default class Score extends Component {
               align="center"
               style={{
                 position: "absolute",
-                top: 120,
-                left: -500,
+                top: 150,
+                left: -690,
                 whiteSpace: "nowrap",
                 color: "white",
                 fontFamily: "'Roboto', sans-serif",
@@ -116,7 +86,26 @@ export default class Score extends Component {
                 fontSize: "2.5rem",
               }}
             >
-              Your top song playlist
+              Your top Artist playlist
+            </Typography>
+            <Typography
+              component="h4"
+              variant="h4"
+              align="center"
+              style={{
+                position: "absolute",
+                top: 150,
+                left: -220,
+                whiteSpace: "nowrap",
+                color: "white",
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: "bold",
+                borderBottom: "10px solid white",
+                paddingBottom: "10px",
+                fontSize: "2.5rem",
+              }}
+            >
+              Your top Song playlist
             </Typography>
             <Typography
               component="h4"
@@ -130,8 +119,8 @@ export default class Score extends Component {
                 borderRadius: "10px",
                 boxShadow: "10px 10px 10px rgba(0, 0, 0, 0.1)",
                 position: "absolute",
-                top: 100,
-                left: -50,
+                top: 0,
+                left: 230,
                 color: "white",
                 fontFamily: "'Roboto', sans-serif",
                 fontWeight: "bold",
@@ -156,7 +145,60 @@ export default class Score extends Component {
               left: -50,
             }}
           >
-            {columns}
+            <Grid item xs={6} style={{ padding: "20px" }}>
+              <Grid container direction="column" spacing={2}>
+                {artists.map((artist, index) => (
+                  <Box
+                    key={index}
+                    style={{
+                      backgroundColor: "rgba(223,214,239, 0.3)",
+                      padding: "20px",
+                      marginBottom: "20px",
+                      textAlign: "left",
+                      fontSize: "2.5rem",
+                      color: "white",
+                      fontWeight: "bold",
+                      whiteSpace: "nowrap",
+                      borderRadius: "5px",
+                      boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                      width: "400px",
+                      height: "45px",
+                      position: "relative",
+                      left: "50px",
+                    }}
+                  >
+                    {index + 1} / {artist}
+                  </Box>
+                ))}
+              </Grid>
+            </Grid>
+            <Grid item xs={6} style={{ padding: "20px" }}>
+              <Grid container direction="column" spacing={2}>
+                {songs.map((song, index) => (
+                  <Box
+                    key={index}
+                    style={{
+                      backgroundColor: "rgba(223,214,239, 0.3)",
+                      padding: "20px",
+                      marginBottom: "20px",
+                      textAlign: "left",
+                      fontSize: "2.5rem",
+                      color: "white",
+                      fontWeight: "bold",
+                      whiteSpace: "nowrap",
+                      borderRadius: "5px",
+                      boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                      width: "870px",
+                      height: "45px",
+                      position: "relative",
+                      left: "-175px",
+                    }}
+                  >
+                    {index + 1} / {song}
+                  </Box>
+                ))}
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </div>
