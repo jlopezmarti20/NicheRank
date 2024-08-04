@@ -1,7 +1,7 @@
 from typing import Dict, List
 from dataclasses import dataclass
 
-import NicheRank.algo_src.music as md
+import music as md
 from sorting import StatSorter, GlobalSorter
 
 """
