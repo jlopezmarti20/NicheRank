@@ -9,17 +9,15 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-import music_dataclass as md
+import NicheRank.algo_src.music as md
 
 """
-    Methods for parsing json into objects for python class use.
-    This can be edited according to however the database is setup.
-
+    Methods for creating or reading json information and database files.
 """
 
 
 def deserialize_database(stats_json_path) -> Dict[Dict[str, md.Artist_Stat], Dict[str, md.Song_Stat]]:
-    # Database_json -> Database Dict with artist_stats: and song_stats:
+    # converts Database_json into Database Dict with artist_stats: and song_stats:
     with open(stats_json_path, 'r') as f:
         json_data = json.load(f)
 
@@ -29,6 +27,7 @@ def deserialize_database(stats_json_path) -> Dict[Dict[str, md.Artist_Stat], Dic
             "song_stats": songs_dict}
 
 class CustomJSONEncoder(json.JSONEncoder):
+    # encodes a music object into a dictionary
     def default(self, obj):
         if isinstance(obj, (md.Artist_Stat, md.Song_Stat, md.Artist, md.Song)):
             return md.convert_music_to_dict(obj)
@@ -36,8 +35,9 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 def parse_spotify_history_json(response)->List[md.Song]:
     """
-        parse playlist spotify into a list  of song stats 
-        see https://developer.spotify.com/documentation/web-api/reference/get-recently-played for more on responses
+        parse spotify history json into a list  of song stats 
+        see https://developer.spotify.com/documentation/web-api/reference/get-recently-played 
+        for more on responses
         return: List[md.Song]
     """
     if isinstance(response, str):
@@ -66,9 +66,8 @@ def parse_spotify_history_json(response)->List[md.Song]:
     return recently_played
 
 def create_spotify_response(songs: List[md.Song]) -> dict:
-    """
-    Create a Spotify-like response list from a list of Song objects.
-    """
+    # Turns a list of songs into a spotify response dictionary. Used in user generation
+    
     response_items = []
     for song in songs:
         track = {
@@ -86,21 +85,23 @@ def create_spotify_response(songs: List[md.Song]) -> dict:
     }
     return response
 
-class Dataset_Loader:
-    """
-        Class for loading slices from Million Spotify Database
-    """
+"""
+    The dataset loader class is used to load and work with the slices
+    the 1 Million Playlists database uses.
+"""
+
+class DatasetLoader:
 
     def load_slice(slice_path, version="fast")->List[ Tuple[int, List[md.Song]]]:
         # loads into a list of playlists, each holding num_followers and songs in that playlist
         if version == "fast":
-            return Dataset_Loader.faster_load_slice(slice_path)
+            return DatasetLoader.faster_load_slice(slice_path)
         
         elif version == "slow":
-            return Dataset_Loader.slow_load_slice(slice_path)
+            return DatasetLoader.slow_load_slice(slice_path)
         
         else:
-            return Dataset_Loader.faster_load_slice(slice_path)
+            return DatasetLoader.faster_load_slice(slice_path)
 
     def slow_load_slice(slice_path)->List[ Tuple[int, List[md.Song]]]:
         
@@ -212,7 +213,7 @@ class Dataset_Extractor():
             # current slice has playlists 
             cur_slice = slices[i]
             cur_slice_path = os.path.join(data_dir, cur_slice)
-            playlists: List[Tuple[int, List[md.Song]]] = Dataset_Loader.load_slice(cur_slice_path, json_parse)
+            playlists: List[Tuple[int, List[md.Song]]] = DatasetLoader.load_slice(cur_slice_path, json_parse)
             
             for j, (followers, playlist) in enumerate(playlists):
                 if i == endslice and j == num_playlists % 1000:
@@ -242,7 +243,7 @@ class Dataset_Extractor():
         for i in slice_range:
             cur_slice = slices[i]
             cur_slice_path = os.path.join(data_dir, cur_slice)
-            playlists: List[Tuple[int, List[md.Song]]] = Dataset_Loader.load_slice(cur_slice_path, json_parse)
+            playlists: List[Tuple[int, List[md.Song]]] = DatasetLoader.load_slice(cur_slice_path, json_parse)
 
             for j, (followers, playlist) in enumerate(playlists):
                 if i == endslice and j == num_playlists % 1000:

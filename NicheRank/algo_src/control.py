@@ -1,6 +1,6 @@
 import file_management as fm
-import music_dataclass as md
-from analyze_history import Mainstream_Engine, User_Metrics
+import NicheRank.algo_src.music as md
+from analyze_history import HistoryAnalyzer, User_Metrics
 from users import UserManager
 import itertools
 
@@ -9,9 +9,8 @@ from typing import List, Dict
 import os
 
 """
-    This meant to explain how this workflow should go. Each method of loading the data
-    can be moldable to however the database works.
-
+    Control allows all the pieces to come together from the Database, User, and Analytics engine
+    to produce final results.
 """
 
 DATABASE_DIR = "NicheRank/algo_src/database"
@@ -51,7 +50,7 @@ def get_metrics_fake_user(history_size, database_name=DEFAULT_DATABASE, pop_leve
     song_history:List[md.Song] = fm.parse_spotify_history_json(json_history_path)
 
     # generate metrics
-    metrics_engine = Mainstream_Engine(history=song_history, database=database)
+    metrics_engine = HistoryAnalyzer(history=song_history, database=database)
     metrics:User_Metrics = metrics_engine.analyze_history(sorting=sorting_type)
 
     return metrics
@@ -73,7 +72,7 @@ def get_metrics_spotify_user(history, database_name=DEFAULT_DATABASE,
     song_history:List[md.Song] = fm.parse_spotify_history_json(history)
 
     # generate metrics
-    metrics_engine = Mainstream_Engine(history=song_history, database=database)
+    metrics_engine = HistoryAnalyzer(history=song_history, database=database)
     metrics = metrics_engine.analyze_history(sorting=sorting_type)
     return metrics
 

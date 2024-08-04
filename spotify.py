@@ -59,7 +59,7 @@ def get_recently_played():
 
     #gets only uris in a list, not formatted
     
-    file_path = "file_save_location"
+    file_path = "user_history.json"
     with open(file_path, "w") as f:
         json.dump(data, f)
     
