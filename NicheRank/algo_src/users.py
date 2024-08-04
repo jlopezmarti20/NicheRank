@@ -5,11 +5,11 @@ import json
 
 from file_management import deserialize_database, parse_spotify_history_json, create_spotify_response
 from sorting import Sorter
-import music_dataclass as md
+import NicheRank.algo_src.music as md
 
 """
-    This class is generating example histories for creating 
-    example user listening histories like in spotify.
+    UserManager generates example histories of various popularity 
+    levels as if you have requested from spotify your requests.
 """
 
 class UserManager():

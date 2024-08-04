@@ -9,7 +9,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-import music_dataclass as md
+import NicheRank.algo_src.music as md
 
 """
     Methods for parsing json into objects for python class use.

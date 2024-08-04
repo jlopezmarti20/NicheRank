@@ -1,7 +1,12 @@
 from dataclasses import dataclass, asdict, field
 from typing import List, Dict
 
-# data class
+"""
+    Music stores classes for artists, songs, 
+    songstats and artiststats. 
+"""
+
+# Stores a artists name and uri, checks if artists are equal
 @dataclass
 class Artist:
     name:str = None
@@ -13,6 +18,7 @@ class Artist:
         else:
             return False
 
+# Stores a songs name, uri, song_length, and artists song is by.
 @dataclass 
 class Song:
     name:str = None
@@ -26,6 +32,7 @@ class Song:
         else:
             return False
 
+# stores stats about an artist
 @dataclass
 class Artist_Stat:
     artist:Artist = None
@@ -60,6 +67,7 @@ class Artist_Stat:
         else:
             return False
 
+# songstats about a song from how it has been listened to.
 @dataclass
 class Song_Stat:
     song:Song
@@ -90,7 +98,8 @@ class Song_Stat:
             return False        
 
 def calculate_artist_popularity(artist_stat:Artist_Stat):
-    # simple popularity metric
+    # simple popularity metric for how much an artist has been listened to.
+
     a = 0.05
     weighted_score = artist_stat.weighted_listens*a
     unweighted_score = artist_stat.total_songs
@@ -98,14 +107,14 @@ def calculate_artist_popularity(artist_stat:Artist_Stat):
     return weighted_score + unweighted_score
 
 def calculate_song_popularity(song_stat:Song_Stat):
-
+    # simple metric for a songs listening time
     a = 0.05
     weighted_score = song_stat.weighted_listens*a
     unweighted_score = song_stat.total_listens
     return weighted_score + unweighted_score
 
 def convert_dict_to_music(json_dict):
-    # dict is a dictionary representing a dataclass object
+    # converts a dict representation of a artist, song or stat into that object
     if "artists" in json_dict:
         # this is a song 
         song = Song(name=json_dict["name"],
@@ -133,8 +142,9 @@ def convert_dict_to_music(json_dict):
         # this is a artist 
         return Artist(name=json_dict["name"], uri=json_dict["uri"])
 
-# for json encoding
+
 def convert_music_to_dict(music)-> dict:
+    # encodes a music object as a dictionary for storage
     if isinstance(music, Song_Stat):
         return {
             'song': convert_music_to_dict(music.song),
@@ -166,6 +176,11 @@ def convert_music_to_dict(music)-> dict:
     else:
         return None
 
+
+"""
+    The stats extractor takes a list of songs and extracts its
+    artist stats or songstats from it.
+"""
 
 class Stats_Extractor():
 

@@ -1,5 +1,5 @@
 from NicheRank.algo_src.file_management import json_to_music_dict
-from NicheRank.algo_src.music_dataclass import * 
+from NicheRank.algo_src.music import * 
 import random
 import os
 import json

@@ -1,5 +1,5 @@
 import file_management as fm
-import music_dataclass as md
+import NicheRank.algo_src.music as md
 from analyze_history import HistoryAnalyzer, User_Metrics
 from users import UserManager
 import itertools
@@ -11,7 +11,6 @@ import os
 """
     This meant to explain how this workflow should go. Each method of loading the data
     can be moldable to however the database works.
-
 """
 
 DATABASE_DIR = "NicheRank/algo_src/database"

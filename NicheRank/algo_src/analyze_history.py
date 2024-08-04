@@ -1,7 +1,7 @@
 from typing import Dict, List
 from dataclasses import dataclass
 
-import music_dataclass as md
+import NicheRank.algo_src.music as md
 from sorting import StatSorter, GlobalSorter
 
 """
@@ -50,6 +50,10 @@ class HistoryAnalyzer():
         self.g_songs_map: Dict[str, md.Song_Stat] = database["song_stats"]
 
     def analyze_history(self, sorting="q") -> User_Metrics:
+
+        """
+            Returns user metrics from the given history of that user.
+        """
 
         artist_metrics = self.calculate_artist_metrics(sorting)
         song_metrics = self.calculate_song_metrics(sorting)
