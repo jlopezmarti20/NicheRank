@@ -10,7 +10,7 @@ from file_utils import DatasetToDatabase
     This script is for Generating Your Own database from the Playlist Dataset. 
 """
 
-DEFAULT_LP = 0.01
+DEFAULT_LP = 0.1
 
 parser = argparse.ArgumentParser(description="A simple example of argparse")
 

@@ -78,16 +78,20 @@ class UserManager():
             os.remove(os.path.join(self.users_dir, user))
 
 
-    def greedy_generate_history(self, size:int = 10000, pop_level="med"):
+    def greedy_generate_history(self, size:int = 10000, pop_level="a"):
         """
             This method uses a greedy algorithm for playlist generation
             pop_level: low, med, or high. This reflects the listening habits of the user
             size: number of songs in playlist
         """
-        local_size = 10 # size of greedy algorithm view size
+        if pop_level == "a":
+            local_size = 3 # size of greedy algorithm view size
+        elif pop_level == "b":
+            local_size = 3
+        elif pop_level == "b":
+            local_size = 3
 
-        spontiniety = random.uniform(0.4, 1)  # how likely you are to listen to a bunch of songs
-        max_times_listened = 20
+        max_times_listened = 10
 
         # grap a bunch of songs, and then choose the one of nth popularity 
         stats_list = [(uri, song_stat.popularity)for uri, song_stat in self.database_song_stats.items()]
@@ -105,18 +109,31 @@ class UserManager():
             # we now want the small, medium, or large 
             # choose the smallest, medium or large value by using a heap 
             Sorter.quicksort(choices)
-            if pop_level == "low":
-                choose_idx = local_size - 1
-            elif pop_level == "med":
-                choose_idx = local_size//2
-            elif pop_level == "high":
-                choose_idx = 0
 
+            if pop_level == "a":
+                c_idx = local_size - 1 - random.randint(0, local_size//3)# size of greedy algorithm view size
+            elif pop_level == "b":
+                c_idx = local_size // 2
+            elif pop_level == "c":
+                c_idx = 0 + random.randint(0, local_size//4)
+
+            song = choices[c_idx] # choose largest of choices
+            # pop level determines how many times song is added
+            max_times_listened *= (song[1]/100)
+            max_times_listened += random.randint(1, 4)
+            if pop_level == "low" and song[1] < 33:
+                times_listened = 3 * int(random.randint(0, int(max_times_listened)))
+            elif (pop_level == "high" and song[1] > 66):
+                times_listened = 3 * int(random.randint(0, max_times_listened))
+            elif pop_level == "med" and (song[1] > 33 and song[1] < 66):
+
+                times_listened = 3 * int(random.randint(0, max_times_listened))
+            else:
+                times_listened = 3
             # add this song this many times!
-            times_listened = int(random.randint(0, max_times_listened) * spontiniety)
             j = 0
             while (j < times_listened and i < size):
-                history[i] = choices[choose_idx]
+                history[i] = song
                 j += 1
                 i += 1
 

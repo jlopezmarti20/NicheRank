@@ -15,7 +15,7 @@ import itertools
 """
 
 DATABASE_DIR = "NicheRank/database"
-DEFAULT_DATABASE = "default_db_10000" # by default use the 100_000 songs database
+DEFAULT_DATABASE = "default_db_100000" # by default use the 100_000 songs database
 
 EXAMPLE_USERS_DIR = "NicheRank/example_users"
 
@@ -87,9 +87,16 @@ def test_fake_user_gen_examples():
         print(f"testing {size} {pop_level} {s}")
         metric = get_metrics_fake_user(history_size=size, pop_level=pop_level, sorting_type=s)    
         resulting_metrics.append(metric)
-        print(f"finished\n")
+        print(f"pop score of {metric.pop_score}")
     
     print("finished testing all the parts!")
+
+def test_spotify_history():
+    history = "user_history.json"
+    sorting_type = "m"
+    database_name = "db_10000"
+    get_metrics_spotify_user(history, sorting_type=sorting_type, database_name=database_name)
+
 
 def large_user_test():
 

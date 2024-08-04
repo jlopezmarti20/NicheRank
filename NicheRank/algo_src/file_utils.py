@@ -39,7 +39,7 @@ def convert_list_to_stat(tup: Tuple)-> md.Stat:
     """
 
     if len(tup) == 4:
-        artist = md.Artist_Stat(artist=md.Artist(tup[1], tup[0]),
+        artist = md.Artist_Stat(artist=md.Artist(name=tup[1], uri=tup[0]),
                                 weighted_listens=tup[3],
                                 total_listens=tup[2])
         return artist
