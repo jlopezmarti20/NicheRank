@@ -1,26 +1,27 @@
 import React, { Component } from "react";
 import { Grid, Typography, Box, Button } from "@material-ui/core";
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"; // use to route the button between the links
 
 export default class Score extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      artists: [],
-      songs: [],
-      obscurityScore: 0,
-      error: null,
+      artists: [], // Holds the list of top artists
+      songs: [], // Holds the list of top songs
+      obscurityScore: 0, // Holds the obscurity score
+      error: null, // Holds any error message
     };
   }
 
+  // Fetches user metrics from the backend when the component mounts
   componentDidMount() {
     fetch("http://127.0.0.1:5000/user_metrics")
       .then((response) => response.json())
       .then((data) => {
         this.setState({
-          artists: data.topArtists,
-          songs: data.topSongs,
-          obscurityScore: (data.pop_score * 100).toFixed(1),
+          artists: data.topArtists, // Set the top artists
+          songs: data.topSongs, // Set the top songs
+          popularityScore: (data.pop_score * 100).toFixed(1), // Calculate and set the obscurity score
         });
       })
       .catch((error) => {
@@ -30,10 +31,11 @@ export default class Score extends Component {
   }
 
   render() {
-    const { artists, songs, obscurityScore, error } = this.state;
+    const { artists, songs, popularityScore, error } = this.state;
 
     return (
       <div
+        // Main container that sets the full viewport height, background color, centers its children components, and applies a css specific font
         style={{
           height: "100vh",
           background: "#AD96DC",
@@ -43,6 +45,7 @@ export default class Score extends Component {
           fontFamily: "'Roboto', sans-serif",
         }}
       >
+        {/* Back button to navigate to the home page  and apply CSS style*/}
         <Button
           color="primary"
           variant="contained"
@@ -58,7 +61,9 @@ export default class Score extends Component {
         >
           Back
         </Button>
+        {/* Main grid container */}
         <Grid container spacing={6} style={{ height: "100%", width: "auto" }}>
+          {/* Grid item for the headers */}
           <Grid
             item
             xs={12}
@@ -69,6 +74,7 @@ export default class Score extends Component {
               position: "relative",
             }}
           >
+            {/* Header for top artist playlist */}
             <Typography
               component="h4"
               variant="h4"
@@ -88,6 +94,8 @@ export default class Score extends Component {
             >
               Your top Artist playlist
             </Typography>
+
+            {/* Header for top song playlist */}
             <Typography
               component="h4"
               variant="h4"
@@ -107,6 +115,8 @@ export default class Score extends Component {
             >
               Your top Song playlist
             </Typography>
+
+            {/* Obscurity score display */}
             <Typography
               component="h4"
               variant="h4"
@@ -120,16 +130,17 @@ export default class Score extends Component {
                 boxShadow: "10px 10px 10px rgba(0, 0, 0, 0.1)",
                 position: "absolute",
                 top: 0,
-                left: 230,
+                left: 200,
                 color: "white",
                 fontFamily: "'Roboto', sans-serif",
                 fontWeight: "bold",
                 fontSize: "2.5rem",
               }}
             >
-              Obscurity Score: {obscurityScore}%
+              Popularity Score: {popularityScore}%
             </Typography>
           </Grid>
+          {/* Grid container for the lists */}
           <Grid
             container
             item
@@ -145,6 +156,7 @@ export default class Score extends Component {
               left: -50,
             }}
           >
+            {/* Grid item for the top artists list */}
             <Grid item xs={6} style={{ padding: "20px" }}>
               <Grid container direction="column" spacing={2}>
                 {artists.map((artist, index) => (
@@ -172,6 +184,7 @@ export default class Score extends Component {
                 ))}
               </Grid>
             </Grid>
+            {/* Grid item for the top songs list */}
             <Grid item xs={6} style={{ padding: "20px" }}>
               <Grid container direction="column" spacing={2}>
                 {songs.map((song, index) => (

@@ -1,23 +1,24 @@
 import React from "react";
 import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  useLocation,
+  BrowserRouter as Router, // BrowserRouter for handling routing
+  Routes, // Routes component to define route paths
+  Route, // Route component to define individual routes
+  Link, // Link component for navigation
+  useLocation, // Hook to access the current location
 } from "react-router-dom";
-import { Grid, Typography, Button } from "@mui/material";
-import Score from "./Score";
+import { Grid, Typography, Button } from "@mui/material"; // Importing Material-UI components
+import Score from "./Score"; // Importing the Score component
 
 function App() {
-  const location = useLocation();
-  const isHomePage = location.pathname === "/";
+  const location = useLocation(); // Hook to get the current location
+  const isHomePage = location.pathname === "/"; // Check if the current path is the home page
 
   const handleLogin = () => {
     window.location.href = "http://127.0.0.1:5000/"; // Redirect to Flask backend for authentication
   };
 
   return (
+    // Main container that sets the layout, centering, background color, and padding based on the current page
     <div
       style={{
         display: "flex",
@@ -32,6 +33,7 @@ function App() {
       }}
     >
       <Routes>
+        {/* Route for the home page */}
         <Route
           path="/"
           element={
@@ -85,6 +87,7 @@ function App() {
             </Grid>
           }
         />
+        {/* Route for the Score page */}
         <Route path="/Score" element={<Score />} />
       </Routes>
     </div>
