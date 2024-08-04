@@ -15,6 +15,7 @@ from analyze_history import User_Metrics
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(64)
 
+USER_CHOICE = 0 # number from 0 to 4
 
 #this is connecting the Spotify for Developers (SfD) with my project- the client ID and Secret are what connects them
 client_id = '52500f70b3534d0bae16a8efac5a70af'
