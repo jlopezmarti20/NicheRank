@@ -24,6 +24,10 @@ redirect_uri = 'http://localhost:5000/callback'
 #this is what determines what displays when I am asking for user permission for their data
 scope = 'user-read-recently-played'
 
+#CHANGE THIS OPTION FOR DIFFERENT USERS.
+# 0 is spotify login. (spotify accounts need to be authenticated in SfD) login with user: Amanda Brannon pw: Workingonit1!
+# 1,2,3 are differently generated users with 100000 points of data
+user_option = 0
 
 #this makes a new session upon opening the page- this is important as the authorization token is only temporary
 cache_handler = FlaskSessionCacheHandler(session)
@@ -44,10 +48,17 @@ sp = Spotify(auth_manager=sp_oauth)
 #this: https://accounts.spotify.com/authorize?client_id=52500f70b3534d0bae16a8efac5a70af&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fcallback&scope=user-read-recently-played&show_dialog=True
 @app.route('/')
 def home():
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
-        auth_url = sp_oauth.get_authorize_url()
-        return redirect(auth_url)
-    return redirect(url_for('get_recently_played'))
+    if (user_option == 0):
+        if not sp_oauth.validate_token(cache_handler.get_cached_token()):
+            auth_url = sp_oauth.get_authorize_url()
+            return redirect(auth_url)
+        return redirect(url_for('get_recently_played'))
+    elif (user_option == 1):
+        return redirect(url_for('fake_user1'))
+    elif (user_option == 2):
+        return redirect(url_for('fake_user2'))
+    elif (user_option == 3):
+        return redirect(url_for('fake_user3'))
 
 
 #this callback function happens when you have logged in- it authorizes with your access token and reroutes you to collecting data
@@ -73,7 +84,7 @@ def get_recently_played():
     with open(file_path, "w") as f:
         json.dump(data, f)
 
-    #return redirect(url_for('user_metrics'))
+    #return redirect(url_for('fake_user1'))
     redirect_uri = 'http://127.0.0.1:8000/Score'
     return redirect(redirect_uri)
 
@@ -83,6 +94,21 @@ def user_metrics():
     history_path = "user_history.json"
     metrics: User_Metrics = ctrl.get_metrics_spotify_user(history=history_path, sorting_type=sorting_type)
     return jsonify(metrics)
+
+@app.route('/fake_user1', methods=['GET'])   #http://127.0.0.1:5000/fake_user1
+def fake_user1():
+    fake_metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="med", gen_type="greedy", sorting_type="q")
+    return jsonify(fake_metrics)
+
+@app.route('/fake_user2', methods=['GET'])   #http://127.0.0.1:5000/fake_user2
+def fake_user2():
+    fake_metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="low", gen_type="greedy", sorting_type="m")
+    return jsonify(fake_metrics)
+
+@app.route('/fake_user3', methods=['GET'])   #http://127.0.0.1:5000/fake_user3
+def fake_user3():
+    fake_metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="high", gen_type="greedy", sorting_type="q")
+    return jsonify(fake_metrics)
 
 #this never happens since we redirect to the frontend :)
 @app.route('/logout')
