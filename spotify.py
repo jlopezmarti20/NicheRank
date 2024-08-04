@@ -77,7 +77,7 @@ def get_recently_played():
     redirect_uri = 'http://127.0.0.1:8000/Score'
     return redirect(redirect_uri)
 
-@app.route('/user_metrics', methods=['GET'])   #http://127.0.0.1:5000/user-metrics
+@app.route('/user_metrics', methods=['GET'])   #http://127.0.0.1:5000/user_metrics
 def user_metrics():
     sorting_type = "q" #can be q or m
     history_path = "user_history.json"
