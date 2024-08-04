@@ -151,8 +151,12 @@ class DatasetLoader:
 
         return parsed_slice
 
-# behavior class
-class Dataset_Extractor():
+"""
+    DatasetToDatabase converts the 1M Playlist Dataset into a database
+    with ArtistStats and SongStats saved as a optimized json file
+
+"""
+class DatasetToDatabase():
 
     def __init__(self, database_path, profile=False) -> None:
         
@@ -173,9 +177,9 @@ class Dataset_Extractor():
     def create_database(self, load_percent=0.5, save=True):
 
         # loads both artist and music stats together
-        artist_database: Dict[str, md.Artist_Stat] = self.extract_dataset_artist_stats(load_percent=load_percent)
-        song_database: Dict[str, md.Song_Stat] = self.extract_dataset_song_stats(load_percent=load_percent)
-
+        song_database: Dict[str, Tuple] = self.extract_dataset_song_stats(load_percent=load_percent)
+        artist_database: Dict[str, Tuple] = self.extract_artiststats_from_song_database(song_database, load_percent=load_percent)
+        
         num_playlists = int(load_percent * 1_000_000)
         database = {
                     "artist_stats": artist_database, 
@@ -188,10 +192,30 @@ class Dataset_Extractor():
         with open(save_path, "w") as f:
             json.dump(database, f, cls=CustomJSONEncoder, indent=2)
 
-
-    def extract_dataset_artist_stats(self, load_percent=0.5,json_parse="fast") -> Dict[str, md.Artist_Stat]:
+    def extract_artiststats_from_song_database(self, song_database:Dict[str, Tuple], load_percent) -> Dict[str, Tuple]:
         """
-            creates a list of artist stats (unordered) 
+            loads artist database from already created song database. Magic!!!
+        
+            returns: {artist_uri:(name, total_listens, weighted_l, sec_l)}
+        """
+
+        artist_stats_dict = {}
+
+        for song_uri, (song_name, artist_name, artist_uri, total_listens, weighted_listens, time_s_listened) in song_database.items():
+            if artist_uri not in artist_stats_dict:
+                new_artist = (artist_name, 0, 0, 0)
+                artist_stats_dict[artist_uri] = new_artist
+            artist_stats_dict[artist_uri][1] += total_listens
+            artist_stats_dict[artist_uri][2] += weighted_listens
+            artist_stats_dict[artist_uri][3] += time_s_listened
+        return artist_stats_dict
+
+    def extract_dataset_artist_stats(self, load_percent=0.5,json_parse="fast") -> List[(str, str, int, int, int)]:
+        """
+            creates a list of artist stats after parsing through data file using hashmap
+            
+            returns list of artist information as 
+            [(uri_compressed, name, total_listens, weighted_listens, seconds_listened)]
         """
 
         if (load_percent < 0.0 or load_percent > 1.0):
@@ -220,9 +244,11 @@ class Dataset_Extractor():
                 md.Stats_Extractor.extract_artiststats(playlist, artist_dict, followers=followers)
         return artist_dict        
         
-    def extract_dataset_song_stats(self, load_percent=0.5, json_parse="fast") -> Dict[str, md.Song_Stat]:
+    def extract_dataset_song_stats(self, load_percent=0.5, json_parse="fast") -> Dict[str, Tuple]:
         """
             Creates a list of song_stats (unordered)
+            returns dict of song info as 
+            {str: (uri_compressed, name, artist_uri_compressed, total_listens, weighted_listen, seconds_listened)}
         
         """
         if (load_percent < 0.0 or load_percent > 1.0):
@@ -247,6 +273,7 @@ class Dataset_Extractor():
                 if i == endslice and j == num_playlists % 1000:
                     break
 
-                md.Stats_Extractor.extract_songstats(playlist, songs_dict, followers=followers)
+                md.Stats_Extractor.optimized_extract_songstats(playlist, songs_dict, followers=followers)
                     
         return songs_dict
+    

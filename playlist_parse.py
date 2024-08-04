@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from NicheRank.algo_src.file_utils import Dataset_Extractor
+from NicheRank.algo_src.file_utils import DatasetToDatabase
 
 """
     This script is for Generating Your Own database from the Playlist Dataset. 
@@ -26,7 +26,7 @@ def main():
     lp = handle_lp(args)
     playlist_dir = "NicheRank/playlist_dataset"
     playist_path = os.path.join(playlist_dir, "spotify_million_playlist_dataset")
-    extractor = Dataset_Extractor(playist_path, profile=args.profile)
+    extractor = DatasetToDatabase(playist_path, profile=args.profile)
     extractor.create_database(load_percent=lp, save=True)
 
 if __name__ == "__main__":

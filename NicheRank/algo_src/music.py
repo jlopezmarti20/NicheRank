@@ -197,7 +197,6 @@ class Stats_Extractor():
                 artist_stats_dict[artist.uri].weighted_listens += followers
                 artist_stats_dict[artist.uri].total_songs += 1
 
-    
     def extract_song_stats_from_songs(songs: List[Song]) -> List[Song_Stat]:
         SS_dict = {}
         Stats_Extractor.extract_songstats(songs, SS_dict, 1)
@@ -212,3 +211,16 @@ class Stats_Extractor():
             song_stats_dict[song.uri].total_listens += 1
             song_stats_dict[song.uri].weighted_listens += followers
 
+
+    def optimized_extract_songstats(playlist:List[Song], optimized_songs_dict: Dict[str, tuple], followers=followers):
+        # optimized extracts songstats from playlist
+        
+        for song in playlist:
+            if song.uri not in optimized_songs_dict:
+                song_stat = (song.name, song.artists[0].name, song.artists[0].get_uri(), 0, 0, 0)
+                optimized_songs_dict[song.uri] = song_stat 
+            optimized_songs_dict[song.uri][3] += 1 # total listens
+            optimized_songs_dict[song.uri][4] += followers # weighted listens
+            optimized_songs_dict[song.uri][5] += song.duration_s # time listened
+
+        pass
