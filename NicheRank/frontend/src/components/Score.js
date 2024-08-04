@@ -6,22 +6,33 @@ export default class Score extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: "Jesus",
-      playlist: ["Song #1"],
-      obscurityScore: 72,
+      artist: [],
+      song: [],
+      obscurityScore: 0,
     };
   }
 
   componentDidMount() {
-    // Fetch playlist data
+    fetch("http://127.0.0.1:5000/user_metrics")
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({
+          artist: data.topArtists,
+          obscurityScore: (data.pop_score * 100).toFixed(1),
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        this.setState({ error: error.message });
+      });
   }
 
   render() {
-    const { user, playlist, obscurityScore } = this.state;
+    const { artist, obscurityScore } = this.state;
     const columns = [];
 
-    for (let i = 0; i < playlist.length; i += 5) {
-      const songs = playlist.slice(i, i + 5);
+    for (let i = 0; i < artist.length; i += 5) {
+      const songs = artist.slice(i, i + 5);
       columns.push(
         <Grid item xs={4} key={i} style={{ padding: "20px" }}>
           <Grid container direction="column" spacing={2}>
