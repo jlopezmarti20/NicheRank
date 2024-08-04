@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-from flask import Flask, request, redirect, session, url_for
+from flask import Flask, request, redirect, session, url_for, jsonify
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.cache_handler import FlaskSessionCacheHandler
@@ -83,8 +83,8 @@ def user_metrics():
     history_path = "user_history.json"
     metrics: User_Metrics = ctrl.get_metrics_spotify_user(history=history_path, sorting_type=sorting_type)
     #Example list of songs: songs = ["Song1", "Song2", "Song3"]
-    print(metrics)
-    return(None)
+
+    return jsonify(metrics)
 
 #this never happens since we redirect to the frontend :)
 @app.route('/logout')
@@ -92,6 +92,9 @@ def logout():
     session.clear()
     return redirect(url)
 
+def metrics_to_dict(metrics) -> dict:
+    # turns metrics into a dictionary
+    pass
 
 #the backbone of all python files
 if __name__ == '__main__':
