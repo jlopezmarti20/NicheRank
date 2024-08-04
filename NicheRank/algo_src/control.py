@@ -1,6 +1,6 @@
 import file_management as fm
 import music_dataclass as md
-from analyze_history import Mainstream_Engine, User_Metrics
+from analyze_history import HistoryAnalyzer, User_Metrics
 from users import UserManager
 import itertools
 
@@ -51,7 +51,7 @@ def get_metrics_fake_user(history_size, database_name=DEFAULT_DATABASE, pop_leve
     song_history:List[md.Song] = fm.parse_spotify_history_json(json_history_path)
 
     # generate metrics
-    metrics_engine = Mainstream_Engine(history=song_history, database=database)
+    metrics_engine = HistoryAnalyzer(history=song_history, database=database)
     metrics:User_Metrics = metrics_engine.analyze_history(sorting=sorting_type)
 
     return metrics
@@ -73,7 +73,7 @@ def get_metrics_spotify_user(history, database_name=DEFAULT_DATABASE,
     song_history:List[md.Song] = fm.parse_spotify_history_json(history)
 
     # generate metrics
-    metrics_engine = Mainstream_Engine(history=song_history, database=database)
+    metrics_engine = HistoryAnalyzer(history=song_history, database=database)
     metrics = metrics_engine.analyze_history(sorting=sorting_type)
     return metrics
 

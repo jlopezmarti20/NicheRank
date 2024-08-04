@@ -5,8 +5,8 @@ import music_dataclass as md
 from sorting import StatSorter, GlobalSorter
 
 """
-    THIS IS THE MOST IMPORTANT CLASS!!! Takes your listening history 
-    and outputs metrics based on it 
+    Metrics store information about a users listening history, 
+    retrieved from the HistoryAnalyzer class.
 
 """
 
@@ -31,8 +31,13 @@ class User_Metrics:
     time_listened_s: float
 
 
-# Behavior Class
-class Mainstream_Engine():
+"""
+    The HistoryAnalyzer class analyzes the history of the 
+    a history list of songs. It outputs a User Metric when
+    analyze history is called.
+"""
+
+class HistoryAnalyzer():
 
     def __init__(self, history: List[md.Song], database: Dict[str, md.Artist_Stat]) -> None:
         # sorting is q for quick, m for merge
