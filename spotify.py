@@ -55,12 +55,9 @@ def home():
             auth_url = sp_oauth.get_authorize_url()
             return redirect(auth_url)
         return redirect(url_for('get_recently_played'))
-    elif (user_option == 1):
-        return redirect(url_for('fake_user1'))
-    elif (user_option == 2):
-        return redirect(url_for('fake_user2'))
-    elif (user_option == 3):
-        return redirect(url_for('fake_user3'))
+    
+    else:
+        return redirect(url_for('get_recently_played'))
 
 
 #this callback function happens when you have logged in- it authorizes with your access token and reroutes you to collecting data
@@ -76,15 +73,16 @@ def callback():
 #so that you can get to your score page (this redirect connection point took us hours to figure out.)
 @app.route('/get_recently_played')
 def get_recently_played():
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
-        auth_url = sp_oauth.get_authorize_url()
-        return redirect(auth_url)
+    if (user_option == 0):
+        if not sp_oauth.validate_token(cache_handler.get_cached_token()):
+            auth_url = sp_oauth.get_authorize_url()
+            return redirect(auth_url)
 
-    data = sp.current_user_recently_played()
-    
-    file_path = "user_history.json"
-    with open(file_path, "w") as f:
-        json.dump(data, f)
+        data = sp.current_user_recently_played()
+        
+        file_path = "user_history.json"
+        with open(file_path, "w") as f:
+            json.dump(data, f)
 
     #return redirect(url_for('fake_user1'))
     redirect_uri = 'http://127.0.0.1:8000/Score'
@@ -92,44 +90,112 @@ def get_recently_played():
 
 @app.route('/user_metrics', methods=['GET'])   #http://127.0.0.1:5000/user_metrics
 def user_metrics():
-    sorting_type = "q"  # can be q or m
-    history_path = "user_history.json"
-    metrics: User_Metrics = ctrl.get_metrics_spotify_user(history=history_path, sorting_type=sorting_type)
+    if (user_option == 0):
+        sorting_type = "q"  # can be q or m
+        history_path = "user_history.json"
+        metrics: User_Metrics = ctrl.get_metrics_spotify_user(history=history_path, sorting_type=sorting_type)
 
-    # Access the favorites attribute directly from the Artist_Metrics
+        # Access the favorites attribute directly from the Artist_Metrics
+        artist_list = metrics.artist_metrics.favorites
+
+        #Access song metrics
+        song_list = metrics.song_metrics.favorites
+        #print(song_list[:10])
+
+        # Access the pop_score attribute
+        pop_score = metrics.pop_score
+
+
+        # Create a response dictionary containing both the artist list and the pop score
+        response = {
+            "topArtists": artist_list[:5],  # get only the top 10 favorite artists
+            "pop_score": pop_score,
+            "topSongs": song_list[:5]
+        }
+
+        return jsonify(response)
+    elif (user_option == 1):
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="med", gen_type="greedy", sorting_type="q")
+        artist_list = metrics.artist_metrics.favorites
+        song_list = metrics.song_metrics.favorites
+        pop_score = metrics.pop_score
+        response = {
+            "topArtists": artist_list[:5],
+            "pop_score": pop_score,
+            "topSongs": song_list[:5]
+        }
+
+        return jsonify(response)
+    elif (user_option == 2):
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="low", gen_type="greedy", sorting_type="m")
+        artist_list = metrics.artist_metrics.favorites
+        song_list = metrics.song_metrics.favorites
+        pop_score = metrics.pop_score
+        response = {
+            "topArtists": artist_list[:5],
+            "pop_score": pop_score,
+            "topSongs": song_list[:5]
+        }
+
+        return jsonify(response)
+    elif(user_option == 3):
+        metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="high", gen_type="greedy", sorting_type="q")
+        artist_list = metrics.artist_metrics.favorites
+        song_list = metrics.song_metrics.favorites
+        pop_score = metrics.pop_score
+        response = {
+            "topArtists": artist_list[:5],
+            "pop_score": pop_score,
+            "topSongs": song_list[:5]
+        }
+
+        return jsonify(response)
+
+
+
+"""
+@app.route('/fake_user1', methods=['GET'])   #http://127.0.0.1:5000/fake_user1
+def fake_user1():
+    metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="med", gen_type="greedy", sorting_type="q")
     artist_list = metrics.artist_metrics.favorites
-
-    #Access song metrics
     song_list = metrics.song_metrics.favorites
-    #print(song_list[:10])
-
-    # Access the pop_score attribute
     pop_score = metrics.pop_score
-
-
-    # Create a response dictionary containing both the artist list and the pop score
     response = {
-        "topArtists": artist_list[:10],  # get only the top 10 favorite artists
+        "topArtists": artist_list[:10],
         "pop_score": pop_score,
         "topSongs": song_list[:10]
     }
 
     return jsonify(response)
 
-@app.route('/fake_user1', methods=['GET'])   #http://127.0.0.1:5000/fake_user1
-def fake_user1():
-    fake_metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="med", gen_type="greedy", sorting_type="q")
-    return jsonify(fake_metrics)
-
 @app.route('/fake_user2', methods=['GET'])   #http://127.0.0.1:5000/fake_user2
 def fake_user2():
-    fake_metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="low", gen_type="greedy", sorting_type="m")
-    return jsonify(fake_metrics)
+    metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="low", gen_type="greedy", sorting_type="m")
+    artist_list = metrics.artist_metrics.favorites
+    song_list = metrics.song_metrics.favorites
+    pop_score = metrics.pop_score
+    response = {
+        "topArtists": artist_list[:10],
+        "pop_score": pop_score,
+        "topSongs": song_list[:10]
+    }
+
+    return jsonify(response)
 
 @app.route('/fake_user3', methods=['GET'])   #http://127.0.0.1:5000/fake_user3
 def fake_user3():
-    fake_metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="high", gen_type="greedy", sorting_type="q")
-    return jsonify(fake_metrics)
+    metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="high", gen_type="greedy", sorting_type="q")
+    artist_list = metrics.artist_metrics.favorites
+    song_list = metrics.song_metrics.favorites
+    pop_score = metrics.pop_score
+    response = {
+        "topArtists": artist_list[:10],
+        "pop_score": pop_score,
+        "topSongs": song_list[:10]
+    }
+
+    return jsonify(response)
+"""
 
 #this never happens since we redirect to the frontend :)
 @app.route('/logout')
