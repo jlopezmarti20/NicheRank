@@ -151,52 +151,6 @@ def user_metrics():
 
         return jsonify(response)
 
-
-
-"""
-@app.route('/fake_user1', methods=['GET'])   #http://127.0.0.1:5000/fake_user1
-def fake_user1():
-    metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="med", gen_type="greedy", sorting_type="q")
-    artist_list = metrics.artist_metrics.favorites
-    song_list = metrics.song_metrics.favorites
-    pop_score = metrics.pop_score
-    response = {
-        "topArtists": artist_list[:10],
-        "pop_score": pop_score,
-        "topSongs": song_list[:10]
-    }
-
-    return jsonify(response)
-
-@app.route('/fake_user2', methods=['GET'])   #http://127.0.0.1:5000/fake_user2
-def fake_user2():
-    metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="low", gen_type="greedy", sorting_type="m")
-    artist_list = metrics.artist_metrics.favorites
-    song_list = metrics.song_metrics.favorites
-    pop_score = metrics.pop_score
-    response = {
-        "topArtists": artist_list[:10],
-        "pop_score": pop_score,
-        "topSongs": song_list[:10]
-    }
-
-    return jsonify(response)
-
-@app.route('/fake_user3', methods=['GET'])   #http://127.0.0.1:5000/fake_user3
-def fake_user3():
-    metrics: User_Metrics= ctrl.get_metrics_fake_user(history_size=100000, pop_level="high", gen_type="greedy", sorting_type="q")
-    artist_list = metrics.artist_metrics.favorites
-    song_list = metrics.song_metrics.favorites
-    pop_score = metrics.pop_score
-    response = {
-        "topArtists": artist_list[:10],
-        "pop_score": pop_score,
-        "topSongs": song_list[:10]
-    }
-
-    return jsonify(response)
-"""
-
 #this never happens since we redirect to the frontend :)
 @app.route('/logout')
 def logout():
