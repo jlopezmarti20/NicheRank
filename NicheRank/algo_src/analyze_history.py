@@ -28,7 +28,6 @@ class User_Metrics:
     artist_metrics: Artist_Metrics
     song_metrics: Song_Metrics
     pop_score: float # val from 0 to 100 of how popular this persons taste is+
-    time_listened_s: float
 
 
 """
@@ -57,9 +56,8 @@ class HistoryAnalyzer():
 
         artist_metrics = self.calculate_artist_metrics(sorting)
         song_metrics = self.calculate_song_metrics(sorting)
-        time_listened_s = sum(artist_stat.total_s for artist_stat in self.user_artist_stats)
         pop_score = self.calculate_mainstream_score()        
-        cur_metric = User_Metrics(artist_metrics=artist_metrics, song_metrics=song_metrics, time_listened_s=time_listened_s, pop_score=pop_score)
+        cur_metric = User_Metrics(artist_metrics=artist_metrics, song_metrics=song_metrics, pop_score=pop_score)
 
         return cur_metric
     
@@ -100,13 +98,13 @@ class HistoryAnalyzer():
         
         return song_met
  
-    def calculate_mainstream_score(self):
+    def calculate_mainstream_score(self) -> float:
 
         # use calculate_percentile
         return self.calculate_percentile()
 
 
-    def calculate_percentile(self):
+    def calculate_percentile(self) -> float:
 
         """
             Calculates what percentile of listening popularity a users artists stats are at.
@@ -126,8 +124,8 @@ class HistoryAnalyzer():
             else:
                 artist_global_weight = 1
             
-            total_songs_listened += artist_stat.total_songs
-            sum_pop_artists += artist_stat.total_songs * artist_global_weight
+            total_songs_listened += artist_stat.total_listens
+            sum_pop_artists += artist_stat.total_listens * artist_global_weight
 
         avg_artist_pop = sum_pop_artists/total_songs_listened
 
