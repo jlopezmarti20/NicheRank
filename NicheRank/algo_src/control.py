@@ -1,3 +1,8 @@
+import sys
+
+from typing import List, Dict
+import os
+
 import file_utils as fm
 import music as md
 from analyze_history import HistoryAnalyzer, User_Metrics
@@ -5,8 +10,6 @@ from users import UserManager
 import itertools
 
 
-from typing import List, Dict
-import os
 
 """
     Control allows all the pieces to come together from the Database, User, and Analytics engine

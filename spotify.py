@@ -1,10 +1,15 @@
 import os
+import sys
 import json
 from flask import Flask, request, redirect, session, url_for
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.cache_handler import FlaskSessionCacheHandler
 
+sys.path.append("NicheRank/algo_src")
+
+import control as ctrl
+from analyze_history import User_Metrics
 
 #this is how to start the file with Flask, then create a randomized secret key
 app = Flask(__name__)
@@ -71,13 +76,12 @@ def get_recently_played():
     redirect_uri = 'http://127.0.0.1:8000/Score'
     return redirect(redirect_uri)
 
-"""
-@app.route('/user-metrics', methods=['GET'])
-def get_user_metrics():
-    #Example list of songs
-    songs = ["Song1", "Song2", "Song3"]
-    return jsonify(songs)
-"""
+@app.route('/user_metrics', methods=['GET'])   #http://127.0.0.1:5000/user-metrics
+def user_metrics():
+    sorting_type = "q" #can be q or m
+    metrics: User_Metrics = ctrl.get_metrics_spotify_user('user_history.json', database_name=ctrl.DEFAULT_DATABASE, sorting_type=sorting_type)
+    #Example list of songs: songs = ["Song1", "Song2", "Song3"]
+    return (metrics)
 
 #this never happens since we redirect to the frontend :)
 @app.route('/logout')
