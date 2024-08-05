@@ -30,10 +30,16 @@ Our motivation was that Spotify does not have any sort of metrics as to how popu
 
 ## Tools/Languages/Libraries Used
 
-1. <span style="font-size:20px; font-weight:bold;">Frontend</span>
+### 1. **Frontend**
+- [ReactJS:](https://react.dev/) Utilize ReactJS, a JavaScript framework that provides a foundation for developing dynamic and responsive web applications.
 
+### 2. **Backend**
+- [Django with RESt:](https://www.django-rest-framework.org/)  Utilize Django with REST framework to build powerful and flexible APIs for web applications.
+- [FLASK:](https://flask.palletsprojects.com/en/3.0.x/) Utilize Flask framework to integrate Spotify and communicate with our frontend.
 
-
+## 3. **Development Tools**
+- [Visual Studio Code:](https://code.visualstudio.com/) A versatile code editor that provides debugging, task running, and version control for streamlined development.
+- [Github:](https://github.com/jlopezmarti20/NicheRank) Version control and collaboration were managed using GitHub, enabling effective team collaboration and code tracking.
 
 ## Contributors
 
