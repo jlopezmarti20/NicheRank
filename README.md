@@ -13,7 +13,7 @@ To use the database, please do the following:
 
 Due to the size of the database, we have already created it on our own. If you would like to generate your own database, do the following: 
 
-1. Download zip from https://www.aicrowd.com/challenges/spotify-million-playlist-dataset-challenge#dataset 
+1. Download zip from https://drive.google.com/drive/folders/1P_A_GMWGeT8Z4Lz1Z0E65n_gdTMMibZ9?usp=sharing
 2. Unzip file into the NicheRank/playlist_database folder.
 3. Run the playlist_parse.py as   
     playlist_parse.py --load_percent 0.3 --profile True 
