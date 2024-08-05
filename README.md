@@ -21,13 +21,41 @@ Due to the size of the database, we have already created it on our own. If you w
 
 Keep in mind, it takes around 1.5 minutes to parse 10% of the database, so either keep the value low or give it some time.
 
+## Problem
+Our project aimed to solve the question as to whether a Spotify user is listening to popular or niche music and artists in comparison with the one-million playlist Spotify dataset.
+
+## Motivation
+Our motivation was that Spotify does not have any sort of metrics as to how popular your current listening history is. Through our web application, a user is able to sign into their Spotify account, give access permission, and then be presented with how popular their music taste is, as well as their top songs and artists.
+
+
+
 ## Contributors
+
 Jesus Lopez 
-Role: Frontend Developer
+
+**Role:** 
+
+Frontend Developer
+
+Led the frontend development using ReactJS and DJango with REST Frameworks, creating user interface, including buttons, text fields, and ensuring easy integration between the backend and frontend. 
+
+
 
 Amanda Brannon
-Role: Data retrieval and Backend Developer
+
+**Role:** 
+
+Data retrieval and Backend Developer
+
+Created and utilized the Spotify API for user authentication and user data extraction to be used in the comparison algorithms. Assisted with integration of the backend and frontend.
+
 
 Matthew Boughton
-Role: Backend Developer
+
+**Role:**
+
+Backend Developer
+
+Created inheritance heirarcy for songs, artists, songstats and artist stats. Parsed the million playlists dataset and created an compression serialization and deserialization workflow. Created greedy user history generation and metrics for scoring users popularity score in comparison to global database. Created the quicksort and mergesort for quickly sorting the listening history by its local listens and according to the global listens, all within a inheritance based sorting structure. Controlled serialization of data into json and control flow of analysis algorithm and population scoring. 
+
 
