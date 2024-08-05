@@ -28,7 +28,7 @@ Our project aimed to solve the question as to whether a Spotify user is listenin
 Our motivation was that Spotify does not have any sort of metrics as to how popular your current listening history is. Through our web application, a user is able to sign into their Spotify account, give access permission, and then be presented with how popular their music taste is, as well as their top songs and artists.
 
 
-##Tools/Languages/Libraries Used
+## Tools/Languages/Libraries Used
 
 1. <span style="font-size:20px; font-weight:bold;">Frontend</span>
 
