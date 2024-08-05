@@ -1,5 +1,5 @@
 # Niche Song Ranking
-
+---
 ## General Use Instructions
 
 To use the database, please do the following:
