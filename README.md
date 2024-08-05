@@ -45,30 +45,36 @@ Our motivation was that Spotify does not have any sort of metrics as to how popu
 
 ## Contributors
 
-[Jesus Lopez](https://github.com/jlopezmarti20)  
+###[Jesus Lopez](https://github.com/jlopezmarti20)  
 
 **Role:** 
 
 Frontend Developer
 
+**Contribution**
+
 Led the frontend development using ReactJS and DJango with REST Frameworks, creating user interface, including buttons, text fields, and ensuring easy integration between the backend and frontend. 
 
 
 
-[Amanda Brannon](https://github.com/AmandaBrannon)  
+###[Amanda Brannon](https://github.com/AmandaBrannon)  
 
 **Role:** 
 
 Data retrieval and Backend Developer
 
+**Contribution**
+
 Created and utilized the Spotify API for user authentication and user data extraction to be used in the comparison algorithms. Assisted with integration of the backend and frontend.
 
 
-[Matthew Boughton](https://github.com/mattcattb)  
+###[Matthew Boughton](https://github.com/mattcattb)  
 
 **Role:**
 
 Backend Developer
+
+**Contribution**
 
 Created inheritance heirarcy for songs, artists, songstats and artist stats. Parsed the million playlists dataset and created an compression serialization and deserialization workflow. Created greedy user history generation and metrics for scoring users popularity score in comparison to global database. Created the quicksort and mergesort for quickly sorting the listening history by its local listens and according to the global listens, all within a inheritance based sorting structure. Controlled serialization of data into json and control flow of analysis algorithm and population scoring. 
 
