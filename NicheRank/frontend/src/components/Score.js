@@ -8,7 +8,7 @@ export default class Score extends Component {
     this.state = {
       artists: [], // Holds the list of top artists
       songs: [], // Holds the list of top songs
-      obscurityScore: 0, // Holds the obscurity score
+      popularityScore: 0, // Holds the obscurity score
       error: null, // Holds any error message
     };
   }

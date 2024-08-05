@@ -3,7 +3,7 @@ import { render } from "react-dom";
 import Home from "./Home";
 import Score from "./Score";
 
-// Main React component that serves as the entry point of your application
+// Main React component that serves as the entry point of our application
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -20,5 +20,4 @@ export default class App extends Component {
 
 const appDiv = document.getElementById("app");
 
-// Render the App component into the div with id 'app', effectively starting your React application
-render(<App />, appDiv);
+render(<App />, appDiv); // Effectively start our application
