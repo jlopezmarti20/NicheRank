@@ -38,7 +38,7 @@ Our motivation was that Spotify does not have any sort of metrics as to how popu
 
 - [FLASK:](https://flask.palletsprojects.com/en/3.0.x/) Utilize Flask framework to integrate Spotify and communicate with our frontend.
 
-## 3. **Development Tools**
+### 3. **Development Tools**
 - [Visual Studio Code:](https://code.visualstudio.com/) A versatile code editor that provides debugging, task running, and version control for streamlined development.
 
 - [Github:](https://github.com/jlopezmarti20/NicheRank) Version control and collaboration were managed using GitHub, enabling effective team collaboration and code tracking.
