@@ -2,9 +2,7 @@ import json
 from typing import List, Tuple, Dict
 import os
 from tqdm import tqdm
-import sys
-import os
-import sys
+import time
 
 import music as md
 
@@ -63,6 +61,7 @@ def parse_spotify_history_json(response)->List[md.Song]:
         for more on responses
         return: List[md.Song]
     """
+    
     if isinstance(response, str):
         # response is a file location  
         with open(response, "r") as f:
@@ -171,7 +170,14 @@ class DatasetToDatabase():
         song_stats = [(uri, *stats) for uri, stats in songstat_dir.items()]
 
         # now save these into a directory with artists json and songs json
-        dir_name = f"db_{num_playlists}"
+
+        current_time = time.localtime()
+
+        # Format the time as a string
+        time_string = time.strftime("%H:%M:%S", current_time)
+
+        # Format the date and time as a string
+        dir_name = f"db_{num_playlists}_{time_string}"
         save_path = os.path.join(self.save_location, dir_name)
         os.mkdir(save_path)
         # save song and artist stats into their sperate json files
@@ -232,4 +238,3 @@ class DatasetToDatabase():
                 md.Stats_Extractor.optimized_extract_songstats(playlist, songs_dict, followers=followers)
                     
         return songs_dict
-    
