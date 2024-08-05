@@ -45,7 +45,7 @@ Our motivation was that Spotify does not have any sort of metrics as to how popu
 
 ## Contributors
 
-###[Jesus Lopez](https://github.com/jlopezmarti20)  
+### [Jesus Lopez](https://github.com/jlopezmarti20)  
 
 **Role:** 
 
@@ -57,7 +57,7 @@ Led the frontend development using ReactJS and DJango with REST Frameworks, crea
 
 
 
-###[Amanda Brannon](https://github.com/AmandaBrannon)  
+### [Amanda Brannon](https://github.com/AmandaBrannon)  
 
 **Role:** 
 
@@ -68,7 +68,7 @@ Data retrieval and Backend Developer
 Created and utilized the Spotify API for user authentication and user data extraction to be used in the comparison algorithms. Assisted with integration of the backend and frontend.
 
 
-###[Matthew Boughton](https://github.com/mattcattb)  
+### [Matthew Boughton](https://github.com/mattcattb)  
 
 **Role:**
 
