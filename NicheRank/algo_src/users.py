@@ -56,7 +56,7 @@ class UserManager():
 
 
     def get_user_songs(self, name) -> List[md.Song]:
-        # selects a user from example user history
+        # selects a user from example user history and gets their songs
         name = name + ".json" if ".json" not in name else name
         path = os.path.join(self.users_dir, name)
         if not os.path.exists(path):
@@ -74,6 +74,7 @@ class UserManager():
             os.remove(user_path)
 
     def delete_all_users(self):
+        # deletes all users in folder
         for user in os.listdir(self.users_dir):
             os.remove(os.path.join(self.users_dir, user))
 
@@ -81,12 +82,11 @@ class UserManager():
     def greedy_generate_history(self, size:int = 10000, pop_level="a"):
         """
             This method uses a greedy algorithm for playlist generation
-            pop_level: low, med, or high. This reflects the listening habits of the user
+            pop_level: a, b, c. This reflects what to choose from the limited view during the greedy generation.
             size: number of songs in playlist
         """
 
         local_size = 15
-        max_times_listened = 10
 
         # grap a bunch of songs, and then choose the one of nth popularity 
         stats_list = [(uri, song_stat.popularity)for uri, song_stat in self.database_song_stats.items()]
